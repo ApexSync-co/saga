@@ -1,18 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
 import { fetchUserOrders } from '../../services/orderService';
+import { trackOrder } from '../../services/trackingService';
+import TrackingDisplay from '../../Components/TrackingDisplay';
 
 const MyOrders = () => {
     const { user } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [trackingData, setTrackingData] = useState(null);
+    const [isDemoTracking, setIsDemoTracking] = useState(false);
 
     useEffect(() => {
         const loadOrders = async () => {
             if (user) {
                 try {
                     const userOrders = await fetchUserOrders(user.id);
-                    setOrders(userOrders);
+                    // Add dummy orders if no real orders exist for demonstration
+                    if (userOrders.length === 0) {
+                        setOrders([
+                            {
+                                id: 'ORD-101-GOLD',
+                                date: 'Oct 10, 2026',
+                                total: '₹24,500',
+                                status: 'In Transit',
+                                awbNumber: 'V012345678',
+                                paymentId: 'PAY-8899',
+                                address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
+                                items: [{ name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' }],
+                                mockTracking: {
+                                    status: 'In Transit',
+                                    currentLocation: 'Mumbai Hub',
+                                    lastUpdate: 'Oct 14, 09:42 AM'
+                                }
+                            },
+                            {
+                                id: 'ORD-202-SILVER',
+                                date: 'Oct 12, 2026',
+                                total: '₹8,200',
+                                status: 'Packed',
+                                awbNumber: 'V098765432',
+                                paymentId: 'PAY-1122',
+                                address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
+                                items: [{ name: 'Silver Necklace', quantity: 1, image: '/necklace.jpg' }],
+                                mockTracking: {
+                                    status: 'Processing',
+                                    currentLocation: 'Delhi Sorting Center',
+                                    lastUpdate: 'Oct 13, 04:15 PM'
+                                }
+                            }
+                        ]);
+                    } else {
+                        setOrders(userOrders);
+                    }
                 } catch (error) {
                     console.error("Error loading orders:", error);
                 } finally {
@@ -25,6 +65,44 @@ const MyOrders = () => {
 
         loadOrders();
     }, [user]);
+
+    const handleTrackOrder = async (order) => {
+        const awbNumber = order.awbNumber || 'V01197967'; // Using placeholder for testing
+        if (!awbNumber) {
+            alert("No tracking number available for this order.");
+            return;
+        }
+
+        setTrackingData(order);
+        try {
+            // Check if we have items in the order to show in the tracking view
+            const trackingMetadata = {
+                awbNumber,
+                items: order.items || [
+                    { name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' },
+                    { name: 'Saga Signature Ring', quantity: 1, image: '/ring.jpg' }
+                ]
+            };
+
+            const data = await trackOrder(awbNumber);
+            setTrackingData({ ...data, ...trackingMetadata });
+            setIsDemoTracking(false);
+        } catch (error) {
+            console.error("Tracking error:", error);
+            // Fallback for demo purposes as requested
+            setTrackingData({ 
+                awbNumber, 
+                status: "In Transit",
+                items: order.items || [
+                    { name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' },
+                    { name: 'Saga Signature Ring', quantity: 1, image: '/ring.jpg' }
+                ]
+            });
+            setIsDemoTracking(true);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -43,90 +121,94 @@ const MyOrders = () => {
     }
 
     return (
-        <div className="pt-24 min-h-screen text-white container mx-auto px-4 md:px-10 mb-10">
-            <h1 className="text-3xl font-bold mb-8 text-primary border-b-2 border-primary pb-2 inline-block">My Orders</h1>
+        <div className="min-h-screen  text-white font-sans selection:bg-white selection:text-black pt-32 pb-20">
+            <div className="container mx-auto px-6 max-w-6xl">
+                {/* Clean Header */}
+                <div className="flex flex-col md:flex-row justify-between items-baseline mb-16 border-b border-white/5 pb-8">
+                    <h1 className="text-3xl font-light tracking-tight text-white mb-2 md:mb-0">Order History</h1>
+                    <p className="text-[10px] uppercase tracking-[0.4em] text-white/30">Vault / Archive</p>
+                </div>
 
-            {orders.length === 0 ? (
-                <div className="text-center text-white/60 py-10">You have no orders yet.</div>
-            ) : (
-                <div className="space-y-6">
-                    {orders.map((order) => (
-                        <div key={order.id} className="bg-black border border-white rounded-lg overflow-hidden hover:border-primary transition-colors">
-                            <div className="bg-white/5 px-6 py-4 border-b border-white/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div className="flex flex-wrap gap-8 text-sm">
-                                    <div>
-                                        <p className="text-white/60 font-medium">Order Placed</p>
-                                        <p className="font-semibold text-white">{order.date}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-white/60 font-medium">Total</p>
-                                        <p className="font-semibold text-white">{order.total}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-white/60 font-medium">Order ID</p>
-                                        <p className="font-semibold text-white">#{order.id.slice(0, 8)}</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 items-center">
-                                    <div className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${
-                                        order.status === 'Delivered' ? 'bg-green-900/40 text-green-400 ring-green-600' : 'bg-primary/20 text-primary ring-primary'
-                                    }`}>
-                                        {order.status}
-                                    </div>
-                                </div>
-                            </div>
+                {trackingData && (
+                    <TrackingDisplay 
+                        trackingData={trackingData} 
+                        onClose={() => setTrackingData(null)} 
+                        isDemo={isDemoTracking} 
+                    />
+                )}
 
-                            <div className="p-6">
-                                {order.items.map((item, idx) => (
-                                    <div key={idx} className="flex flex-col sm:flex-row gap-6 mb-6 last:mb-0 items-center border-b border-white/10 last:border-0 pb-6 last:pb-0">
-                                        <div className="w-20 h-20 bg-white/10 rounded-md overflow-hidden flex-shrink-0 border border-white/20">
-                                            {item.image ? (
-                                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-xs text-white/40">No Image</div>
-                                            )}
-                                        </div>
-                                        <div className="flex-grow text-center sm:text-left">
-                                            <h3 className="font-bold text-lg text-white group-hover:text-primary transition-colors">{item.name}</h3>
-                                            <p className="text-white/50 text-sm mt-1">Status: {order.status}</p>
-                                        </div>
-                                        <div className="flex gap-2 w-full sm:w-auto">
-                                            <button className="flex-1 sm:flex-none px-4 py-2 border border-white text-white rounded text-sm font-semibold hover:bg-white hover:text-black transition-colors">
-                                                Track
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                                
-                                <div className="mt-4 pt-4 border-t border-white/10 text-xs text-white/40 flex flex-col md:flex-row justify-between gap-4">
-                                    <div>
-                                        <p className="mb-1 text-white/50 uppercase tracking-tighter">Delivering to:</p>
-                                        <p className="text-white/80">{order.address.street}, {order.address.city}, {order.address.zip}</p>
-                                        <p className="mt-2 mb-1 text-white/50 uppercase tracking-tighter">Payment ID:</p>
-                                        <p className="text-white/80 font-mono">{order.paymentId}</p>
-                                    </div>
-                                    
-                                    {order.trackingId && (
-                                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 self-start md:min-w-[240px]">
-                                            <p className="text-primary font-bold text-[10px] tracking-widest uppercase mb-2">Tracking Details</p>
-                                            <div className="flex flex-col gap-2">
-                                                <div>
-                                                    <span className="text-zinc-500 block">Courier</span>
-                                                    <span className="text-white font-medium">{order.courier || 'Standard Shipping'}</span>
-                                                </div>
-                                                <div>
-                                                    <span className="text-zinc-500 block">Tracking Number</span>
-                                                    <span className="text-white font-mono font-medium">{order.trackingId}</span>
-                                                </div>
+                {orders.length === 0 ? (
+                    <div className="py-20 text-center border border-white/5 bg-white/5 rounded-sm">
+                        <p className="text-xs uppercase tracking-widest text-white/20">Your order history is empty</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {orders.map((order) => (
+                            <div key={order.id} className="bg-[#0a0a0a] border border-white/5 hover:border-white/80 transition-colors duration-500 rounded-sm overflow-hidden">
+                                <div className="p-6 md:p-8">
+                                    {/* Order Header: ID and Date */}
+                                    <div className="flex flex-wrap justify-between items-center gap-4 mb-10 pb-6 border-b border-white/5">
+                                        <div className="flex items-center gap-6">
+                                            <div className="space-y-1">
+                                                <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/20">Ref. ID</p>
+                                                <p className="text-sm font-mono text-white/80">#{order.id.slice(0, 12).toUpperCase()}</p>
+                                            </div>
+                                            <div className="w-px h-8 bg-white/5 hidden sm:block"></div>
+                                            <div className="space-y-1">
+                                                <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/20">Date</p>
+                                                <p className="text-sm font-light text-white/60">{order.date}</p>
                                             </div>
                                         </div>
-                                    )}
+                                        <div className="flex items-center gap-4">
+                                            <span className="px-3 py-1 bg-white/5 border border-white/10 text-[9px] uppercase tracking-widest font-medium text-white/80 rounded-sm">
+                                                {order.status}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid lg:grid-cols-12 gap-8 items-center text-left">
+                                        {/* Product Thumbnail & Basic Info */}
+                                        <div className="lg:col-span-6 flex items-center gap-6">
+                                            <div className="w-24 h-24 bg-zinc-900 shrink-0 rounded-sm overflow-hidden border border-white/5">
+                                                <img 
+                                                    src={order.items[0]?.image || '/facebook.avif'} 
+                                                    alt="" 
+                                                    className="w-full h-full object-cover brightness-75 hover:brightness-100 transition-all duration-700"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-xl font-light font-Great_Vibes text-white tracking-wider">
+                                                    {order.items[0]?.name}
+                                                    {order.items.length > 1 && <span className="text-xs text-white/20 ml-2 font-normal">+ {order.items.length - 1} more</span>}
+                                                </h3>
+                                                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Consignee: {order.address?.city}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Valuation */}
+                                        <div className="lg:col-span-2 py-4 lg:py-0 border-y lg:border-y-0 lg:border-x border-white/5 lg:px-6">
+                                            <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/20 mb-1">Total</p>
+                                            <p className="text-xl font-light text-white">{order.total}</p>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
+                                            <button 
+                                                onClick={() => handleTrackOrder(order)}
+                                                className="flex-1 group/btn relative overflow-hidden bg-white text-black py-4 px-6 text-[10px] uppercase font-bold tracking-[0.4em] transition-all duration-500 rounded-sm"
+                                            >
+                                                <span className="relative z-10">Track Shipment</span>
+                                                <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500"></div>
+                                            </button>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

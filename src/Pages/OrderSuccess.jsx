@@ -1,16 +1,41 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { trackOrder } from '../services/trackingService';
+import TrackingDisplay from '../Components/TrackingDisplay';
 
 export default function OrderSuccess() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { orderId, paymentId } = location.state || {};
+    const { orderId, paymentId, awbNumber } = location.state || {};
+    const [trackingData, setTrackingData] = useState(null);
+    const [isTracking, setIsTracking] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         if (!paymentId) {
             navigate('/');
         }
     }, [paymentId, navigate]);
+
+    const handleTrackOrder = async () => {
+        if (!awbNumber) {
+            alert("No tracking number available for this order yet.");
+            return;
+        }
+
+        setIsTracking(true);
+        try {
+            const data = await trackOrder(awbNumber);
+            setTrackingData(data);
+            setShowModal(true);
+            console.log("Tracking Data:", data);
+        } catch (error) {
+            console.error("Tracking error:", error);
+            alert("Failed to fetch tracking details. Please try again later.");
+        } finally {
+            setIsTracking(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-black text-white pt-32 pb-20 px-4 flex flex-col items-center justify-center text-center">
@@ -30,6 +55,12 @@ export default function OrderSuccess() {
                     <span className="text-zinc-500 uppercase tracking-widest text-xs">Payment ID</span>
                     <span className="font-mono text-zinc-200">{paymentId}</span>
                 </div>
+                {awbNumber && (
+                    <div className="flex justify-between items-center mb-4 border-b border-zinc-800 pb-4">
+                        <span className="text-zinc-500 uppercase tracking-widest text-xs">Tracking Number</span>
+                        <span className="font-mono text-zinc-200">{awbNumber}</span>
+                    </div>
+                )}
                 <div className="flex justify-between items-center">
                     <span className="text-zinc-500 uppercase tracking-widest text-xs">Order ID</span>
                     <span className="font-mono text-zinc-200">#{orderId?.slice(0, 8)}</span>
@@ -37,6 +68,15 @@ export default function OrderSuccess() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
+                {awbNumber && (
+                    <button 
+                        onClick={handleTrackOrder}
+                        disabled={isTracking}
+                        className="bg-primary text-white px-8 py-3 font-medium hover:bg-primary/80 transition-colors uppercase tracking-widest text-sm disabled:opacity-50"
+                    >
+                        {isTracking ? 'Tracking...' : 'Track Live Order'}
+                    </button>
+                )}
                 <Link to="/my-orders" className="bg-white text-black px-8 py-3 font-medium hover:bg-zinc-200 transition-colors uppercase tracking-widest text-sm">
                     View My Orders
                 </Link>
@@ -44,6 +84,13 @@ export default function OrderSuccess() {
                     Back to Store
                 </Link>
             </div>
+
+            {showModal && trackingData && (
+                <TrackingDisplay 
+                    trackingData={trackingData} 
+                    onClose={() => setShowModal(false)} 
+                />
+            )}
         </div>
     );
 }

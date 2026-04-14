@@ -4,7 +4,18 @@ import { getCurrentUser, onAuthChange, logoutCustomer } from '../services/authSe
 const AuthContext = createContext();
 
 export const useAuth = () => {
-    return useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        return { 
+            isAuthenticated: false, 
+            user: null, 
+            loading: true, 
+            login: () => {}, 
+            logout: () => {}, 
+            updateUser: () => {} 
+        };
+    }
+    return context;
 };
 
 export const AuthProvider = ({ children }) => {

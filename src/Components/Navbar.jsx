@@ -11,7 +11,8 @@ function Navbar(){
    const [isVisible, setIsVisible] = useState(true);
    const lastScrollY = useRef(0);
    const { getCartCount } = useCart();
-   const { isAuthenticated, user, logout } = useAuth();
+   const auth = useAuth() || {};
+   const { isAuthenticated, user, logout } = auth;
    const cartCount = getCartCount();
 
    useEffect(() => {
@@ -36,7 +37,7 @@ function Navbar(){
 
     return(
         <>
-        <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 bg-black transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} >
+        <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} >
             <ul className=" flex gap-10 mx-10 max-w-fit relative z-50">
                 <button 
                     className="flex flex-col justify-center items-center w-8 h-8 gap-1.5 overflow-hidden" 
@@ -60,7 +61,7 @@ function Navbar(){
                 </button>
             </ul>
 
-           <Link to="/"><img src="/SAGA LOGO.PNG" alt="Logo" className='md:h-15 h-10' /></Link>
+           <Link to="/"><img src="/Logo.png" alt="Logo" className='md:h-15 h-10' /></Link>
 
             <div className="flex text-primary gap-6 md:mx-10 mx-4">
                 <svg onClick={() => setIsSearchOpen(true)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#FB7010" className="w-6 h-6 cursor-pointer hover:text-gray-300">

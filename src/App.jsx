@@ -30,7 +30,7 @@ function App() {
     <div className='min-h-screen'
     style={{
     minHeight: "100vh",
-    background: "linear-gradient(to bottom, black 10%, #7D4E2E 25%)"
+    background: "linear-gradient(to bottom, black 10%, #AE4E0B 55%)"
   }}>
     <Navbar />
     <Routes>

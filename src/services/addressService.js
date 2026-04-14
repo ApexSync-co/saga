@@ -18,14 +18,55 @@ import {
 
 const ADDRESSES_COLLECTION = 'addresses';
 
+/**
+ * Validates address data for DTDC compatibility
+ * @param {Object} address 
+ * @returns {Array} List of validation errors
+ */
+export function validateAddressForDTDC(address) {
+  const errors = [];
+  if (!address.name || address.name.length < 3) errors.push("Full name is required (min 3 chars)");
+  if (!address.phone || !/^\d{10}$/.test(address.phone.replace(/[^0-9]/g, ''))) {
+    errors.push("Valid 10-digit phone number is required");
+  }
+  if (!address.pincode || !/^\d{6}$/.test(address.pincode)) {
+    errors.push("Valid 6-digit pincode is required");
+  }
+  if (!address.addressLine1 || address.addressLine1.length < 5) {
+    errors.push("Address Line 1 is required (min 5 chars)");
+  }
+  if (!address.city) errors.push("City is required");
+  if (!address.state) errors.push("State is required");
+  
+  return errors;
+}
+
+/**
+ * Normalizes address data for integration with Firebase and DTDC
+ */
+const normalizeAddress = (addressData) => ({
+  name: addressData.name?.trim() || '',
+  phone: addressData.phone?.replace(/[^0-9]/g, '') || '',
+  addressLine1: addressData.addressLine1?.trim() || '',
+  addressLine2: addressData.addressLine2?.trim() || '',
+  landmark: addressData.landmark?.trim() || '',
+  city: addressData.city?.trim() || '',
+  state: addressData.state?.trim() || '',
+  pincode: addressData.pincode?.trim() || '',
+  type: addressData.type || 'Home',
+  isDefault: !!addressData.isDefault,
+});
+
 export async function saveAddress(userId, addressData) {
   try {
+    const normalized = normalizeAddress(addressData);
     const docRef = await addDoc(collection(db, ADDRESSES_COLLECTION), {
       userId,
-      ...addressData,
+      ...normalized,
       createdAt: new Date(),
+      updatedAt: new Date(),
     });
-    return { id: docRef.id, ...addressData };
+    return { id: docRef.id, ...normalized };
   } catch (error) {
     console.error("Error saving address:", error);
     throw error;
@@ -39,10 +80,13 @@ export async function fetchUserAddresses(userId) {
       where('userId', '==', userId)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    // Sort by default first, then by creation date
+    return snapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
   } catch (error) {
     console.error("Error fetching addresses:", error);
     return [];
@@ -51,11 +95,40 @@ export async function fetchUserAddresses(userId) {
 
 export async function updateAddress(addressId, updates) {
   try {
+    const normalized = normalizeAddress(updates);
     const docRef = doc(db, ADDRESSES_COLLECTION, addressId);
-    await updateDoc(docRef, updates);
+    await updateDoc(docRef, {
+      ...normalized,
+      updatedAt: new Date()
+    });
     return true;
   } catch (error) {
     console.error("Error updating address:", error);
+    throw error;
+  }
+}
+
+/**
+ * Sets an address as default and unsets others
+ */
+export async function setDefaultAddress(userId, addressId) {
+  try {
+    const addresses = await fetchUserAddresses(userId);
+    const batch = [];
+    
+    for (const addr of addresses) {
+      const docRef = doc(db, ADDRESSES_COLLECTION, addr.id);
+      if (addr.id === addressId) {
+        batch.push(updateDoc(docRef, { isDefault: true }));
+      } else if (addr.isDefault) {
+        batch.push(updateDoc(docRef, { isDefault: false }));
+      }
+    }
+    
+    await Promise.all(batch);
+    return true;
+  } catch (error) {
+    console.error("Error setting default address:", error);
     throw error;
   }
 }
