@@ -4,7 +4,9 @@ import {
     fetchUserAddresses, 
     saveAddress, 
     updateAddress, 
-    removeAddress 
+    removeAddress,
+    validateAddressForDTDC,
+    setDefaultAddress
 } from '../../services/addressService';
 
 const DeliveryAddress = () => {
@@ -14,14 +16,18 @@ const DeliveryAddress = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editAddressId, setEditAddressId] = useState(null);
+    const [formErrors, setFormErrors] = useState([]);
     const [newAddress, setNewAddress] = useState({
         type: 'Home',
         name: '',
-        street: '',
+        addressLine1: '',
+        addressLine2: '',
+        landmark: '',
         city: '',
         state: '',
-        zip: '',
-        phone: ''
+        pincode: '',
+        phone: '',
+        isDefault: false
     });
 
     useEffect(() => {
@@ -43,22 +49,29 @@ const DeliveryAddress = () => {
     }, [user]);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewAddress(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setNewAddress(prev => ({ 
+            ...prev, 
+            [name]: type === 'checkbox' ? checked : value 
+        }));
     };
 
     const resetForm = () => {
         setNewAddress({
             type: 'Home',
             name: '',
-            street: '',
+            addressLine1: '',
+            addressLine2: '',
+            landmark: '',
             city: '',
             state: '',
-            zip: '',
-            phone: ''
+            pincode: '',
+            phone: '',
+            isDefault: false
         });
         setIsEditMode(false);
         setEditAddressId(null);
+        setFormErrors([]);
     };
 
     const handleOpenAddModal = () => {
@@ -68,36 +81,63 @@ const DeliveryAddress = () => {
 
     const handleOpenEditModal = (address) => {
         setNewAddress({
-            type: address.type,
-            name: address.name,
-            street: address.street,
-            city: address.city,
-            state: address.state,
-            zip: address.zip,
-            phone: address.phone
+            type: address.type || 'Home',
+            name: address.name || '',
+            addressLine1: address.addressLine1 || '',
+            addressLine2: address.addressLine2 || '',
+            landmark: address.landmark || '',
+            city: address.city || '',
+            state: address.state || '',
+            pincode: address.pincode || '',
+            phone: address.phone || '',
+            isDefault: address.isDefault || false
         });
         setIsEditMode(true);
         setEditAddressId(address.id);
+        setFormErrors([]);
         setIsModalOpen(true);
     };
 
     const handleSaveAddress = async (e) => {
         e.preventDefault();
+        
+        const errors = validateAddressForDTDC(newAddress);
+        if (errors.length > 0) {
+            setFormErrors(errors);
+            return;
+        }
+
         try {
             if (isEditMode) {
                 await updateAddress(editAddressId, newAddress);
-                setAddresses(addresses.map(addr => 
-                    addr.id === editAddressId ? { ...newAddress, id: editAddressId } : addr
-                ));
+                if (newAddress.isDefault) {
+                    await setDefaultAddress(user.id, editAddressId);
+                }
+                const updatedData = await fetchUserAddresses(user.id);
+                setAddresses(updatedData);
             } else {
                 const saved = await saveAddress(user.id, newAddress);
-                setAddresses([...addresses, saved]);
+                if (newAddress.isDefault) {
+                    await setDefaultAddress(user.id, saved.id);
+                }
+                const updatedData = await fetchUserAddresses(user.id);
+                setAddresses(updatedData);
             }
             setIsModalOpen(false);
             resetForm();
         } catch (error) {
             alert("Failed to save address. Please try again.");
             console.error(error);
+        }
+    };
+
+    const handleSetDefault = async (id) => {
+        try {
+            await setDefaultAddress(user.id, id);
+            const data = await fetchUserAddresses(user.id);
+            setAddresses(data);
+        } catch (error) {
+            alert("Failed to set default address.");
         }
     };
 
@@ -151,11 +191,18 @@ const DeliveryAddress = () => {
                                     <div className="mb-4 inline-block px-3 py-1 bg-zinc-800 text-xs font-medium tracking-widest uppercase text-zinc-300">
                                         {addr.type}
                                     </div>
-                                    <h3 className="font-semibold text-xl mb-2 text-white">{addr.name}</h3>
+                                    <h3 className="font-semibold text-xl mb-2 text-white flex justify-between items-center">
+                                        {addr.name}
+                                        {addr.isDefault && (
+                                            <span className="text-[10px] bg-white text-black px-2 py-0.5 tracking-tighter uppercase font-bold">Default</span>
+                                        )}
+                                    </h3>
                                     <div className="text-zinc-400 space-y-1 text-sm leading-relaxed">
-                                        <p>{addr.street}</p>
-                                        <p>{addr.city}{addr.state ? `, ${addr.state}` : ''} {addr.zip}</p>
-                                        <p className="pt-2 text-white">Ph: {addr.phone}</p>
+                                        <p>{addr.addressLine1}</p>
+                                        {addr.addressLine2 && <p>{addr.addressLine2}</p>}
+                                        {addr.landmark && <p className="italic text-xs text-zinc-500">Landmark: {addr.landmark}</p>}
+                                        <p>{addr.city}, {addr.state} - {addr.pincode}</p>
+                                        <p className="pt-2 text-white font-medium">Ph: {addr.phone}</p>
                                     </div>
                                 </div>
                                 
@@ -166,13 +213,30 @@ const DeliveryAddress = () => {
                                     >
                                         Edit
                                     </button>
+                                    {!addr.isDefault ? (
+                                        <button 
+                                            onClick={() => handleSetDefault(addr.id)}
+                                            className="py-2 text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-400 hover:text-white transition-all duration-300 uppercase tracking-wider"
+                                        >
+                                            Set Default
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            onClick={() => handleDeleteAddress(addr.id)}
+                                            className="py-2 text-sm text-zinc-500 border border-transparent hover:text-red-400 transition-all duration-300 uppercase tracking-wider"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                                {!addr.isDefault && (
                                     <button 
                                         onClick={() => handleDeleteAddress(addr.id)}
-                                        className="py-2 text-sm text-zinc-400 border border-transparent hover:border-red-900 hover:text-red-400 hover:bg-red-950/20 transition-all duration-300 uppercase tracking-wider"
+                                        className="w-full mt-3 py-1.5 text-[10px] text-zinc-600 hover:text-red-500 uppercase tracking-widest transition-colors"
                                     >
-                                        Remove
+                                        Delete Address
                                     </button>
-                                </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -195,105 +259,158 @@ const DeliveryAddress = () => {
                             </div>
                             
                             <div className="p-6">
+                                {formErrors.length > 0 && (
+                                    <div className="mb-6 p-4 bg-red-950/20 border border-red-900 rounded-sm">
+                                        <div className="flex items-center mb-2 text-red-500">
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <span className="text-xs font-bold uppercase tracking-wider">Please fix the following:</span>
+                                        </div>
+                                        <ul className="text-xs text-red-400 list-disc list-inside space-y-1">
+                                            {formErrors.map((err, i) => <li key={i}>{err}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
                                 <form onSubmit={handleSaveAddress} className="space-y-5">
-                                    <div>
-                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Address Type</label>
-                                        <div className="relative">
-                                            <select 
-                                                name="type" 
-                                                value={newAddress.type} 
-                                                onChange={handleInputChange}
-                                                className="w-full p-3 bg-zinc-900 border border-zinc-800 text-white focus:border-white outline-none appearance-none transition-colors"
-                                            >
-                                                <option value="Home">Home</option>
-                                                <option value="Work">Work</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-400">
-                                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Type</label>
+                                            <div className="relative">
+                                                <select 
+                                                    name="type" 
+                                                    value={newAddress.type} 
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-3 bg-zinc-900 border border-zinc-800 text-white focus:border-white outline-none appearance-none transition-colors text-sm"
+                                                >
+                                                    <option value="Home">Home</option>
+                                                    <option value="Work">Work</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-400">
+                                                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div className="flex-1 flex items-end pb-3">
+                                            <label className="flex items-center cursor-pointer group">
+                                                <div className="relative">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        name="isDefault" 
+                                                        checked={newAddress.isDefault}
+                                                        onChange={handleInputChange}
+                                                        className="sr-only"
+                                                    />
+                                                    <div className={`w-5 h-5 border transition-colors ${newAddress.isDefault ? 'bg-white border-white' : 'bg-transparent border-zinc-700'}`}>
+                                                        {newAddress.isDefault && <svg className="w-4 h-4 text-black mx-auto mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
+                                                    </div>
+                                                </div>
+                                                <span className="ml-3 text-xs uppercase tracking-widest text-zinc-400 group-hover:text-white transition-colors">Set as Default</span>
+                                            </label>
                                         </div>
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Full Name</label>
+                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Full Name <span className="text-red-500">*</span></label>
                                         <input 
                                             type="text" 
                                             name="name" 
                                             value={newAddress.name} 
                                             onChange={handleInputChange} 
-                                            required 
-                                            className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors"
+                                            placeholder="e.g. Rahul Sharma"
+                                            className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Street Address</label>
+                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Address Line 1 <span className="text-red-500">*</span></label>
                                         <input 
                                             type="text" 
-                                            name="street" 
-                                            value={newAddress.street} 
+                                            name="addressLine1" 
+                                            value={newAddress.addressLine1} 
                                             onChange={handleInputChange} 
-                                            required 
-                                            className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors"
+                                            placeholder="House No, Building, Street"
+                                            className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Address Line 2</label>
+                                        <input 
+                                            type="text" 
+                                            name="addressLine2" 
+                                            value={newAddress.addressLine2} 
+                                            onChange={handleInputChange} 
+                                            placeholder="Area, Colony, Sector"
+                                            className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Landmark (Optional)</label>
+                                        <input 
+                                            type="text" 
+                                            name="landmark" 
+                                            value={newAddress.landmark} 
+                                            onChange={handleInputChange} 
+                                            placeholder="Near Apollo Hospital"
+                                            className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">City</label>
+                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">City <span className="text-red-500">*</span></label>
                                             <input 
                                                 type="text" 
                                                 name="city" 
                                                 value={newAddress.city} 
                                                 onChange={handleInputChange} 
-                                                required 
-                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors"
+                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">State</label>
+                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">State <span className="text-red-500">*</span></label>
                                             <input 
                                                 type="text" 
                                                 name="state" 
                                                 value={newAddress.state} 
                                                 onChange={handleInputChange} 
-                                                required 
-                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors"
+                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">ZIP Code</label>
+                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Pincode (6-digit) <span className="text-red-500">*</span></label>
                                             <input 
                                                 type="text" 
-                                                name="zip" 
-                                                value={newAddress.zip} 
+                                                name="pincode" 
+                                                value={newAddress.pincode} 
                                                 onChange={handleInputChange} 
-                                                required 
-                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors"
+                                                maxLength="6"
+                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Phone</label>
+                                            <label className="block text-xs uppercase tracking-widest text-zinc-400 mb-2 font-medium">Phone <span className="text-red-500">*</span></label>
                                             <input 
                                                 type="text" 
                                                 name="phone" 
                                                 value={newAddress.phone} 
                                                 onChange={handleInputChange} 
-                                                required 
-                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors"
+                                                maxLength="10"
+                                                placeholder="10-digit mobile number"
+                                                className="w-full p-3 bg-black border border-zinc-800 text-white focus:border-white outline-none transition-colors text-sm"
                                             />
                                         </div>
                                     </div>
 
                                     <button 
                                         type="submit" 
-                                        className="w-full bg-white text-black font-semibold py-4 uppercase tracking-widest text-sm hover:bg-zinc-200 transition-colors duration-300 mt-6"
+                                        className="w-full bg-white text-black font-semibold py-4 uppercase tracking-widest text-sm hover:bg-zinc-200 transition-colors duration-300 mt-8 shadow-2xl"
                                     >
-                                        {isEditMode ? 'Update Address' : 'Save Address'}
+                                        {isEditMode ? 'Update Address' : 'Save Delivery Address'}
                                     </button>
                                 </form>
                             </div>

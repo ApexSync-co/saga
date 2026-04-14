@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 
 function Footer() {
     return (
-        <footer className="w-full bg-black text-white py-16 font-Poppins">
+        <footer className="w-full text-white py-16 font-Poppins">
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
                 
                 {/* Brand Section */}
                 <div className="flex flex-col items-center lg:items-start space-y-4">
-                    <img src="/SAGA LOGO.PNG" alt="Saga Logo" className="h-12 w-auto object-contain rounded-sm" />
+                    <img src="/Logo.png" alt="Saga Logo" className="h-12 w-auto object-contain rounded-sm" />
                     <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
                         Curating timeless elegance for the modern individual. Where simplicity meets sophistication.
                     </p>
