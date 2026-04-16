@@ -228,47 +228,28 @@ export default function Cart() {
 
                             {savedAddresses.length > 0 && (
                                 <div className="mb-6 space-y-4">
-                                    <p className="text-sm text-zinc-400">Select a saved address:</p>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <label className="text-xs text-zinc-400 uppercase tracking-widest">Select a saved address</label>
+                                    <select
+                                        value={selectedAddressId || ''}
+                                        onChange={(e) => {
+                                            if (e.target.value === 'new') {
+                                                handleToggleNewAddress();
+                                            } else {
+                                                const addr = savedAddresses.find(a => a.id === e.target.value);
+                                                if (addr) handleSelectSavedAddress(addr);
+                                            }
+                                        }}
+                                        className="w-full bg-black border border-zinc-700 text-white p-3 text-sm outline-none focus:border-white transition-colors cursor-pointer"
+                                    >
                                         {savedAddresses.map((addr) => (
-                                            <div 
-                                                key={addr.id} 
-                                                onClick={() => handleSelectSavedAddress(addr)}
-                                                className={`p-4 border rounded cursor-pointer transition-all ${
-                                                    selectedAddressId === addr.id 
-                                                        ? 'border-white bg-zinc-800/50' 
-                                                        : 'border-zinc-800 hover:border-zinc-600'
-                                                }`}
-                                            >
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <span className="text-xs px-2 py-1 bg-zinc-800 rounded uppercase font-bold tracking-wide text-zinc-300">
-                                                        {addr.type || 'Home'}
-                                                    </span>
-                                                    {selectedAddressId === addr.id && (
-                                                        <span className="text-xs text-green-400 flex items-center gap-1">
-                                                            <span>✓</span> Selected
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="font-bold text-sm mb-1 text-white">{addr.name}</p>
-                                                <p className="text-sm text-zinc-400">{addr.street}</p>
-                                                <p className="text-sm text-zinc-400">{addr.city}, {addr.state} {addr.zip}</p>
-                                                <p className="text-sm text-zinc-400 mt-2">Ph: {addr.phone}</p>
-                                            </div>
+                                            <option key={addr.id} value={addr.id}>
+                                                {addr.name} — {addr.street}, {addr.city} {addr.zip} | Ph: {addr.phone}
+                                            </option>
                                         ))}
-                                    </div>
-                                    
-                                    {!showNewAddressForm && (
-                                        <button 
-                                            onClick={handleToggleNewAddress}
-                                            className="mt-4 text-sm text-zinc-400 hover:text-white underline underline-offset-4"
-                                        >
-                                            + Deliver to a different address
-                                        </button>
-                                    )}
+                                        <option value="new">+ Deliver to a different address</option>
+                                    </select>
                                 </div>
                             )}
-
                             {showNewAddressForm && (
                                 <div className={`${savedAddresses.length > 0 ? "mt-4 pt-6 border-t border-zinc-800" : ""}`}>
                                     <div className="flex justify-between items-end mb-6">
