@@ -211,7 +211,7 @@ export default function HorizontalCarousal(){
             <div className="mt-8 relative w-[90vw] m-auto group">
                 <div 
                     ref={scrollRef}
-                    className="overflow-x-hidden whitespace-nowrap py-10 md:px-5 flex gap-8 w-full no-scrollbar cursor-grab select-none px-[2vw] md:px-[40vw]"
+                    className="overflow-x-hidden whitespace-nowrap py-10 md:px-5 flex gap-8 w-full no-scrollbar cursor-grab select-none"
                     style={{ 
                         WebkitOverflowScrolling: 'touch',
                         transform: 'translateZ(0)',
