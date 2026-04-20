@@ -154,12 +154,32 @@ export async function fetchFestiveEdit() {
   // This is CMS-like content. For now, return static defaults.
   // In the future, the admin can manage this through Firestore.
   return {
-    items: [
-      { src: '/pl2.jpg', alt: 'Festive Look 1' },
-      { src: '/pl1.jpg', alt: 'Festive Look 2' },
-      { src: '/pl1.jpg', alt: 'Festive Look 3' },
-      { src: '/pl2.jpg', alt: 'Festive Look 4' },
+    carousel: [
+      { 
+        src: '/stock1.jpeg', 
+        alt: 'Festive Look 1',
+        title: 'Make Your Moments Beautiful',
+        subtitle: 'Saga Exclusive'
+      },
+        { 
+        src: '/stock2.jpeg', 
+        alt: 'Festive Look 2',
+        title: 'Crafting Timeless Memories',
+        subtitle: 'The Art of Jewelry'
+      },
+      { 
+        src: '/stock3.jpeg', 
+        alt: 'Festive Look 3',
+        title: 'Elegance for Every Occasion',
+        subtitle: 'Curated Heritage'
+      },
     ],
-    banner: { src: '/stock1.jpg', alt: 'Traditional Coming Soon' },
+    items: [
+      { src: '/stock1.jpeg', alt: 'Festive Look 1' },
+      { src: '/stock2.jpeg', alt: 'Festive Look 2' },
+      { src: '/Rings.jpeg', alt: 'Festive Look 3' },
+      { src: '/stock3.jpeg', alt: 'Festive Look 4' },
+    ],
+    banner: { src: '/stock4.jpg', alt: 'Traditional Coming Soon' },
   };
 }
