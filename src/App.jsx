@@ -27,11 +27,8 @@ function App() {
 
   return (
     <>
-    <div className='min-h-screen'
-    style={{
-    minHeight: "100vh",
-    background: "linear-gradient(to bottom, black 10%, #AE4E0B 55%)"
-  }}>
+    <div className='min-h-screen bg-linear-to-b from-black via-[#AE4E0B] to-black text-white overflow-x-hidden'
+    >
     <Navbar />
     <Routes>
       <Route path="/" element={<Home />} />

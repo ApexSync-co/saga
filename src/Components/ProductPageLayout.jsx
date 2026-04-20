@@ -40,53 +40,89 @@ const ProductPageLayout = ({ title, products }) => {
   }, [hoveredId, isScrolling]);
 
   return (
-    <div className="pt-28 pb-10 px-4 min-h-screen "    
-    style={{
-    minHeight: "100vh",
-    background: "linear-gradient(to bottom, black 40%, #7D4E2E 100%)"
-  }}>
-          <CircularHorizontalScroll />
-      <div className="w-[90vw] m-auto text-zinc-300 text-sm font-medium p-4 drop-shadow-sm">
-        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-        <span className="mx-2 text-zinc-500">•</span>
-        <span className="text-white">{title}</span>
+    <div className="pt-28 pb-20 px-4 min-h-screen selection:bg-primary/30"    
+    >
+      <CircularHorizontalScroll />
+      
+      <div className="max-w-7xl mx-auto mb-12">
+        <div className="flex items-center space-x-2 text-zinc-500 text-xs font-medium tracking-widest uppercase">
+          <Link to="/" className="hover:text-primary transition-colors duration-300">Home</Link>
+          <span className="text-zinc-700">/</span>
+          <span className="text-zinc-300">{title}</span>
+        </div>
       </div>
-      <h1 className="text-white text-center font-Great_Vibes text-7xl md:text-8xl mb-16 mt-10 md:mt-6 tracking-wider drop-shadow-lg">{title}</h1>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
-        {products.map((item) => (
+
+      <div className="relative mb-20">
+        <h1 className="text-white text-center font-Great_Vibes text-7xl md:text-9xl tracking-wider relative z-10 opacity-90 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
+          {title}
+        </h1>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-24 bg-primary/10 blur-[100px] pointer-events-none"></div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-8 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto px-3 md:px-0">
+        {products.map((item, index) => (
           <div 
             key={item.id} 
             onMouseEnter={() => setHoveredId(item.id)}
             onMouseLeave={() => setHoveredId(null)}
             onClick={() => navigate(`/product/${item.id}`)}
-            className={`bg-black/30 backdrop-blur-xl rounded-[2rem] overflow-hidden shadow-2xl transition-all duration-700 cursor-pointer border border-white/10 group flex flex-col h-[22rem] md:h-auto
-            hover:scale-[1.03] hover:z-10 hover:shadow-primary/20 hover:border-primary/50
-            ${showBlur && hoveredId !== item.id ? 'md:blur-sm' : ''}
+            className={`group relative flex flex-col md:flex-row h-auto md:h-96 transition-all duration-700 cursor-pointer 
+            bg-[#111] rounded-xl md:rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl
+            hover:border-primary/20 hover:shadow-primary/5 hover:scale-[1.01]
+            ${showBlur && hoveredId !== item.id ? 'md:opacity-40 md:blur-sm' : 'z-10'}
+            ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}
             `}
           >
-            <div className="h-48 md:h-72 overflow-hidden relative">
+            {/* Image Section */}
+            <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden bg-zinc-900">
               <img 
                 src={item.image} 
                 alt={item.name} 
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              
+              {/* Radial Overlay */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
+              
+
             </div>
-            <div className="p-5 md:p-8 flex flex-col justify-between flex-grow gap-4 bg-gradient-to-b from-transparent to-black/20">
-              <div className="space-y-2">
-                <h3 className="text-white text-xl md:text-2xl font-Poppins font-medium tracking-tight text-center group-hover:text-primary transition-colors line-clamp-1">{item.name}</h3>
-                <p className="text-primary text-center font-bold text-lg md:text-xl drop-shadow-sm">{item.price}</p>
+
+            {/* Content Section */}
+            <div className="w-full md:w-[40%] p-4 md:p-10 flex flex-col justify-between bg-gradient-to-br from-[#111] to-[#000]">
+              <div className="space-y-2 md:space-y-4">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <span className="h-[1px] w-4 md:w-8 bg-primary/40"></span>
+                  <p className="text-zinc-500 font-Poppins text-[8px] md:text-[9px] tracking-[0.3em] md:tracking-[0.5em] uppercase italic">Signature</p>
+                </div>
+                <h3 className="text-white text-center text-base md:text-3xl md:tracking-wider font-Great_Vibes font-medium leading-tight group-hover:text-primary transition-colors duration-500 line-clamp-1 md:line-clamp-2">
+                  {item.name}
+                </h3>
+
+                 <p className="font-Poppins text-[12px] md:text-2xl text-center tracking-tight text-white">{item.price}</p>
               </div>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToCart(item);
-                  e.target.textContent = "Added!";
-                }}
-                className="w-full bg-white/5 text-white py-3 md:py-4 rounded-xl hover:bg-primary hover:text-black transition-all duration-500 font-bold text-sm md:text-base border border-white/10 hover:border-primary active:scale-95 shadow-lg"
-              >
-                Add to Cart
-              </button>
+
+              <div className="mt-4 md:mt-0 flex flex-col gap-3 md:gap-4">
+                <div className="hidden md:flex gap-1">
+                  <span className="h-[1px] w-4 md:w-full bg-primary/40"></span>
+                </div>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(item);
+                    const btn = e.currentTarget;
+                    const originalText = btn.textContent;
+                    btn.textContent = "✓";
+                    btn.classList.add('bg-primary', 'text-black', 'border-primary');
+                    setTimeout(() => {
+                      btn.textContent = originalText;
+                      btn.classList.remove('bg-primary', 'text-black', 'border-primary');
+                    }, 2000);
+                  }}
+                  className="w-full bg-white/5 hover:bg-white text-zinc-100 hover:text-black py-2.5 md:py-4 rounded-lg font-Poppins text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.2em] uppercase transition-all duration-500 border border-white/10 active:scale-[0.98] flex items-center justify-center"
+                >
+                  ADD TO CART
+                </button>
+              </div>
             </div>
           </div>
         ))}

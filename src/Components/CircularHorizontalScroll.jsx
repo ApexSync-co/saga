@@ -1,16 +1,14 @@
-
-
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Static category data — these are the fixed categories in the store
 const CATEGORIES = [
-  { id: 'bangles', name: 'Bangles', handle: 'bangles', image: '/pl1.jpg' },
-  { id: 'bracelets', name: 'Bracelets', handle: 'bracelets', image: '/pl2.jpg' },
-  { id: 'earrings', name: 'Earrings', handle: 'earrings', image: '/pl1.jpg' },
-  { id: 'necklaces', name: 'Necklaces', handle: 'necklaces', image: '/pl2.jpg' },
-  { id: 'pendants', name: 'Pendants', handle: 'pendants', image: '/pl1.jpg' },
-  { id: 'rings', name: 'Rings', handle: 'rings', image: '/pl2.jpg' },
+  { id: 'bangles', name: 'Bangles', handle: 'bangles', image: '/Bangles.png' },
+  { id: 'bracelets', name: 'Bracelets', handle: 'bracelets', image: '/Bracelets.jpeg' },
+  { id: 'earrings', name: 'Earrings', handle: 'earrings', image: '/stock3.jpeg' },
+  { id: 'necklaces', name: 'Necklaces', handle: 'necklaces', image: '/Necklace.jpeg' },
+  { id: 'pendants', name: 'Pendants', handle: 'pendants', image: '/Pendant.jpeg' },
+  { id: 'rings', name: 'Rings', handle: 'rings', image: '/Rings.jpeg' },
 ];
 
 function CircularHorizontalScroll() {
@@ -71,7 +69,7 @@ function CircularHorizontalScroll() {
         ref={scrollRef}
         className="flex overflow-x-auto whitespace-nowrap py-4 md:py-6 px-4 md:px-12 w-full no-scrollbar scroll-smooth gap-4 md:gap-8"
       >
-        {[...categories, ...categories].map((category, index) => (
+        {[...categories].map((category, index) => (
           <div 
             key={`${category.id}-${index}`} 
             className="shrink-0 flex flex-col items-center gap-3 md:gap-4 group cursor-pointer w-20 md:w-auto"
