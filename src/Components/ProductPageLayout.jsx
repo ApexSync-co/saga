@@ -59,7 +59,7 @@ const ProductPageLayout = ({ title, products }) => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-24 bg-primary/10 blur-[100px] pointer-events-none"></div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-8 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto px-3 md:px-0">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto">
         {products.map((item, index) => (
           <div 
             key={item.id} 
@@ -74,7 +74,7 @@ const ProductPageLayout = ({ title, products }) => {
             `}
           >
             {/* Image Section */}
-            <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden bg-zinc-900">
+            <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden">
               <img 
                 src={item.image} 
                 alt={item.name} 
@@ -83,22 +83,34 @@ const ProductPageLayout = ({ title, products }) => {
               
               {/* Radial Overlay */}
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
-              
-
             </div>
 
             {/* Content Section */}
             <div className="w-full md:w-[40%] p-4 md:p-10 flex flex-col justify-between bg-gradient-to-br from-[#111] to-[#000]">
               <div className="space-y-2 md:space-y-4">
-                <div className="flex items-center gap-2 md:gap-3">
-                  <span className="h-[1px] w-4 md:w-8 bg-primary/40"></span>
-                  <p className="text-zinc-500 font-Poppins text-[8px] md:text-[9px] tracking-[0.3em] md:tracking-[0.5em] uppercase italic">Signature</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <span className="h-[1px] w-4 md:w-8 bg-primary/40"></span>
+                    <p className="text-zinc-500 font-Poppins text-[8px] md:text-[9px] tracking-[0.3em] md:tracking-[0.5em] uppercase italic">Signature</p>
+                  </div>
                 </div>
-                <h3 className="text-white text-center text-base md:text-3xl md:tracking-wider font-Great_Vibes font-medium leading-tight group-hover:text-primary transition-colors duration-500 line-clamp-1 md:line-clamp-2">
+
+                <h3 className="text-white text-center text-base md:text-2xl md:tracking-wider font-Great_Vibes font-medium leading-tight group-hover:text-primary transition-colors duration-500 line-clamp-1 md:line-clamp-2">
                   {item.name}
                 </h3>
 
-                 <p className="font-Poppins text-[12px] md:text-2xl text-center tracking-tight text-white">{item.price}</p>
+                 <p className="font-Poppins text-[12px] md:text-2xl text-center tracking-tight text-white mb-2">{item.price}</p>
+                 
+                 {/* Minimalistic Star + Number Rating - Larger Stars */}
+                 <div className="flex justify-center items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={`text-[12px] md:text-[18px] ${i < Math.floor(item.rating || 5) ? 'text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]' : 'text-zinc-800'}`}>
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                 </div>
               </div>
 
               <div className="mt-4 md:mt-0 flex flex-col gap-3 md:gap-4">

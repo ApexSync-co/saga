@@ -91,7 +91,7 @@ function CircularHorizontalScroll() {
               </div>
             </div>
             
-            <span className="text-zinc-400 text-xs md:text-sm font-semibold md:font-medium tracking-wider md:tracking-[0.2em] uppercase 
+            <span className="text-zinc-400 text-[9px] tracking-widest md:text-sm md:font-medium md:tracking-wider md:tracking-[0.2em] uppercase 
                            group-hover:text-primary transition-colors duration-300 md:transform md:group-hover:-translate-y-1">
               {category.name}
             </span>

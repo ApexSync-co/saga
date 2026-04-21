@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 function Footer() {
     return (
-        <footer className="w-full text-white bg-black py-16 font-Poppins">
+        <footer className="w-full text-white py-16 font-Poppins">
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 text-center lg:text-left">
                 
                 {/* Brand Section */}
