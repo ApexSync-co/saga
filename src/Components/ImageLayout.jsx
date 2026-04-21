@@ -71,7 +71,22 @@ export default function ImageLayout(){
         loadContent();
     }, []);
 
-    if (!content) return null;
+    if (!content) {
+        return (
+            <section className="w-[90vw] md:w-[85vw] lg:w-[75vw] m-auto md:py-16 animate-pulse">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-12 px-4">
+                    <div className="h-24 w-64 bg-white/10 rounded-xl" />
+                    <div className="h-16 w-full md:max-w-xs bg-white/5 rounded-lg" />
+                </div>
+                <div className="md:grid md:grid-cols-12 md:grid-rows-2 md:gap-4 lg:gap-6 md:h-[85vh] flex flex-col gap-5 px-4 md:px-0">
+                    <div className="md:col-span-6 md:row-span-2 bg-white/5 rounded-4xl h-[50vh] md:h-auto shadow-2xl" />
+                    <div className="md:col-span-3 md:row-span-1 bg-white/5 rounded-4xl h-[22vh] md:h-auto" />
+                    <div className="md:col-span-3 md:row-span-1 bg-white/5 rounded-4xl h-[22vh] md:h-auto md:block hidden" />
+                    <div className="md:col-span-6 md:row-span-1 bg-white/5 rounded-4xl h-[22vh] md:h-auto" />
+                </div>
+            </section>
+        );
+    }
 
     return(
         <section className="w-[90vw] md:w-[85vw] lg:w-[75vw] m-auto md:py-16">
