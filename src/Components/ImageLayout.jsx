@@ -25,29 +25,11 @@ export default function ImageLayout(){
 
     if (!content) return null; // Or skeleton
 
-    return (
-        <section className="relative w-[85vw] md:w-[85vw] m-auto font-Poppins">
-            {/* Header Section - Modern Desktop, Traditional Mobile */}
-            <div className="relative mb-8 md:mb-2">
-                {/* Desktop Header */}
-                <div className="hidden md:flex flex-col md:flex-row justify-between items-end gap-4">
-                    <div>
-                        <h2 className="text-sm uppercase tracking-widest text-gray-500 mb-2">Curated Collection</h2>
-                        <h1 className="text-9xl font-Great_Vibes text-primary leading-tight">
-                            Festive Edit
-                        </h1>
-                    </div>
-                    <p className="max-w-md text-gray-600 text-lg leading-relaxed mb-8">
-                        Discover our handpicked selection of timeless pieces designed to illuminate your celebrations with elegance and grace.
-                    </p>
-                </div>
-
-                {/* Mobile Header (Restored Original Style) */}
-                <h1 className="md:hidden absolute top-4 right-4 text-white text-right text-6xl font-Great_Vibes z-10 flex flex-col leading-tight pointer-events-none">
-                    <span>Festive</span>
-                    <span>Edit</span>
-                </h1>
-            </div>
+    return(
+        <>
+        <div className="relative w-[90vw] md:w-[75vw] m-auto">
+            <h1 className="absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 translate-y-1/3 left-1/3 text-white md:bg-black md:p-5 rounded-xl md:text-primary text-center text-5xl md:text-6xl font-Great_Vibes z-10">Festive Edit</h1>
+            <div className="grid grid-cols-1 md:flex justify-center items-center gap-15 md:gap-2">
 
             {/* Grid Container */}
             <div className="md:grid md:grid-cols-12 md:grid-rows-2 md:gap-4 md:h-[80vh] flex flex-col gap-5">
