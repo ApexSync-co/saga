@@ -233,10 +233,10 @@ const ProductDetail = () => {
               <button 
                 onClick={handleAddToCart}
                 disabled={adding}
-                className={`w-full relative overflow-hidden font-poppins text-white py-6 rounded-2xl font-bold text-xl transition-all duration-700 flex items-center justify-center gap-3 shadow-2xl active:scale-95
+                className={`w-full group/btn relative overflow-hidden font-poppins py-6 rounded-2xl font-bold text-xl transition-all duration-700 flex items-center justify-center gap-3 shadow-2xl active:scale-95
                   ${adding 
                     ? 'bg-green-600 text-white' 
-                    : 'bg-primary text-black hover:bg-white hover:shadow-[0_20px_40px_rgba(251,112,16,0.4)]'
+                    : 'bg-white/5 text-white border border-white/10 hover:border-primary'
                   }`}
               >
                 {adding ? (
@@ -248,10 +248,13 @@ const ProductDetail = () => {
                   </>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                    </svg>
-                    Add to Bag
+                    <span className="relative z-10 flex items-center justify-center gap-3 transition-colors duration-500 group-hover/btn:text-black">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                        </svg>
+                        Add to Bag
+                    </span>
+                    <div className="absolute inset-0 bg-primary transform translate-y-full transition-transform duration-500 group-hover/btn:translate-y-0"></div>
                   </>
                 )}
               </button>
