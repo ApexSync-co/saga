@@ -49,6 +49,8 @@ const normalizeProduct = (docSnapshot) => {
     stock: data.stock || 0,
     metalColor: data.metalColor || '',
     gemstones: data.gemstones || '',
+    rating: data.rating || 5,
+    reviews_count: data.reviews_count || 0,
     createdAt: data.createdAt?.toDate() || new Date(),
   };
 };
