@@ -9,10 +9,12 @@
 @font-face {
   font-family: "Poppins";
   src: url("./assets/Poppins/Poppins-Regular.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "Great_Vibes";
   src: url("./assets/Great_Vibes/GreatVibes-Regular.ttf");
+  font-display: swap;
 }
 body {
   font-family: "Poppins","Great_Vibes", sans-serif;

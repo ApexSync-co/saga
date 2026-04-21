@@ -23,7 +23,7 @@ export default function CategoryGrid(){
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 w-[90vw] md:w-[80vw] m-auto my-10">
             {CATEGORIES.map((cat) => (
                 <div key={cat.handle} className="cursor-pointer" onClick={() => navigate(`/${cat.handle}`)}>
-                    <img src={cat.image} alt={cat.title} className=" h-[50vw]  md:h-[30vw] w-full object-cover rounded-2xl" />
+                    <img src={cat.image} alt={cat.title} className=" h-[50vw]  md:h-[30vw] w-full object-cover rounded-2xl" loading="lazy" />
                     <h1 className="font-Poppins text-white text-center md:text-2xl text-xs mt-5">{cat.title}</h1>
                 </div>
             ))}
