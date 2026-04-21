@@ -74,7 +74,7 @@ const Help = () => {
                             </div>
                         </div>
 
-                         <button className="w-full bg-primary text-white py-3 rounded font-semibold hover:bg-white hover:text-black transition-colors border border-primary">Chat with Support</button>
+                         <a href="https://wa.me/919847294800" target="_blank" rel="noopener noreferrer" className="w-full inline-block text-center bg-primary text-white py-3 rounded font-semibold hover:bg-white hover:text-black transition-colors border border-primary">Chat with Support</a>
                     </div>
                 </div>
             </div>
