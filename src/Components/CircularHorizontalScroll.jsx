@@ -86,6 +86,7 @@ function CircularHorizontalScroll() {
                   src={category.image} 
                   alt={category.name} 
                   className="w-full h-full object-cover md:opacity-90 md:group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" 
+                  loading="lazy"
                 />
               </div>
             </div>

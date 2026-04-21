@@ -1,9 +1,67 @@
 import { useState, useEffect } from 'react';
 import { fetchFestiveEdit } from '../services/products';
 
+const FestiveCarousel = ({ carousel }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        if (!carousel || carousel.length === 0) return;
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % carousel.length);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, [carousel]);
+
+    if (!carousel) return null;
+
+    return (
+        <div className="md:col-span-6 md:row-span-2 relative group overflow-hidden rounded-4xl md:rounded-[2rem] h-[50vh] md:h-auto shadow-2xl">
+            {carousel.map((item, index) => (
+                <div 
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                        index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                    }`}
+                >
+                    <img 
+                        src={item.src} 
+                        alt={item.alt} 
+                        className="w-full h-full object-cover transform transition-transform duration-10000 md:group-hover:scale-110" 
+                        loading="lazy"
+                    />
+                    
+                    <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-6 md:p-10 text-white">
+                        <div className={`transition-all duration-1000 delay-300 transform ${
+                            index === currentImageIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                        }`}>
+                            <h3 className="text-3xl md:text-5xl font-Great_Vibes leading-tight max-w-[280px] md:max-w-md">
+                                {item.title}
+                            </h3>
+                            <p className="text-sm md:text-base uppercase tracking-[0.2em] font-light mt-3 opacity-90 border-l-2 border-white/30 pl-4">
+                                {item.subtitle}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            ))}
+            
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                {carousel.map((_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            index === currentImageIndex ? 'bg-white w-6' : 'bg-white/50'
+                        }`}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+};
+
 export default function ImageLayout(){
     const [content, setContent] = useState(null);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
         const loadContent = async () => {
@@ -13,71 +71,23 @@ export default function ImageLayout(){
         loadContent();
     }, []);
 
-    useEffect(() => {
-        if (!content?.carousel || content.carousel.length === 0) return;
-
-        const interval = setInterval(() => {
-            setCurrentImageIndex((prev) => (prev + 1) % content.carousel.length);
-        }, 4000); // Change image every 4 seconds
-
-        return () => clearInterval(interval);
-    }, [content]);
-
-    if (!content) return null; // Or skeleton
+    if (!content) return null;
 
     return(
-        <>
-        <div className="relative w-[90vw] md:w-[75vw] m-auto">
-            <h1 className="absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 translate-y-1/3 left-1/3 text-white md:bg-black md:p-5 rounded-xl md:text-primary text-center text-5xl md:text-6xl font-Great_Vibes z-10">Festive Edit</h1>
-            <div className="grid grid-cols-1 md:flex justify-center items-center gap-15 md:gap-2">
+        <section className="w-[90vw] md:w-[85vw] lg:w-[75vw] m-auto md:py-16">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-12 px-4">
+                <h1 className="text-primary text-6xl md:text-8xl lg:text-9xl font-Great_Vibes leading-[0.8] drop-shadow-2xl">
+                    Festive Edit
+                </h1>
+                <p className="text-zinc-400 md:max-w-[280px] lg:max-w-xs text-sm md:text-base leading-relaxed tracking-wide font-light italic border-l border-primary/30 pl-6">
+                    pieces designed to illuminate your celebrations with elegance and grace.
+                </p>
+            </div>
 
             {/* Grid Container */}
-            <div className="md:grid md:grid-cols-12 md:grid-rows-2 md:gap-4 md:h-[80vh] flex flex-col gap-5">
-                {/* Item 1 - Auto Carousel */}
-                <div className="md:col-span-6 md:row-span-2 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[40vh] md:h-auto">
-                    {content.carousel && content.carousel.map((item, index) => (
-                        <div 
-                            key={index}
-                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-                            }`}
-                        >
-                            <img 
-                                src={item.src} 
-                                alt={item.alt} 
-                                className="w-full h-full object-cover transform transition-transform duration-10000 md:group-hover:scale-110" 
-                            />
-                            
-                            {/* Slide-specific Text Overlay */}
-                            <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-6 md:p-10 text-white">
-                                <div className={`transition-all duration-1000 delay-300 transform ${
-                                    index === currentImageIndex ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                                }`}>
-                                    <h3 className="text-3xl md:text-5xl font-Great_Vibes leading-tight max-w-[280px] md:max-w-md">
-                                        {item.title}
-                                    </h3>
-                                    <p className="text-sm md:text-base uppercase tracking-[0.2em] font-light mt-3 opacity-90 border-l-2 border-white/30 pl-4">
-                                        {item.subtitle}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                    
-
-                    {/* Carousel Indicators */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                        {content.carousel.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentImageIndex(index)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                    index === currentImageIndex ? 'bg-white w-6' : 'bg-white/50'
-                                }`}
-                            />
-                        ))}
-                    </div>
-                </div>
+            <div className="md:grid md:grid-cols-12 md:grid-rows-2 md:gap-4 lg:gap-6 md:h-[85vh] flex flex-col gap-5 px-4 md:px-0">
+                {/* Item 1 - Auto Carousel extracted for performance */}
+                <FestiveCarousel carousel={content.carousel} />
 
                 {/* Item 2 */}
                 <div className="md:col-span-3 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[22vh] md:h-auto">
@@ -86,6 +96,7 @@ export default function ImageLayout(){
                             src={content.items[1].src} 
                             alt={content.items[1].alt} 
                             className="w-full h-full object-cover transform transition-transform duration-700 md:group-hover:scale-110 hover:scale-105" 
+                            loading="lazy"
                         />
                     )}
                 </div>
@@ -97,6 +108,7 @@ export default function ImageLayout(){
                             src={content.items[2].src} 
                             alt={content.items[2].alt} 
                             className="w-full h-full object-cover transform transition-transform duration-700 md:group-hover:scale-110 hover:scale-105" 
+                            loading="lazy"
                         />
                     )}
                 </div>
@@ -108,6 +120,7 @@ export default function ImageLayout(){
                             src={content.items[3].src} 
                             alt={content.items[3].alt} 
                             className="w-full h-full object-cover transform transition-transform duration-700 md:group-hover:scale-110 hover:scale-105" 
+                            loading="lazy"
                         />
                     )}
                 </div>
@@ -123,6 +136,7 @@ export default function ImageLayout(){
                     src={content.banner.src} 
                     alt={content.banner.alt} 
                     className="w-full h-full object-cover transform transition-transform duration-1000 md:group-hover:scale-105"
+                    loading="lazy"
                 />
             </div>
         </section>

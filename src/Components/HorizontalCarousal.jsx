@@ -240,6 +240,7 @@ export default function HorizontalCarousal(){
                                 src={item.image} 
                                 alt={item.name} 
                                 draggable="false"
+                                loading="lazy"
                                 className="md:h-[50vh] h-[40vh] lg:h-[75vh] md:w-[50vw] w-[70vw] lg:w-[35vw] object-cover rounded-2xl hover:scale-105 transform transition-transform duration-300 select-none"
                             />
                         </Link>
