@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { initiatePayment } from '../services/paymentService';
 import { saveOrder } from '../services/orderService';
 import { fetchUserAddresses, saveAddress } from '../services/addressService';
+import { calculateShipping } from '../services/shippingService';
 
 export default function Cart() {
     const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -13,11 +14,14 @@ export default function Cart() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
     const [address, setAddress] = useState({
-        street: '',
+        addressLine1: '',
         city: '',
-        zip: '',
+        state: '',
+        pincode: '',
         phone: ''
     });
+    
+    const [shippingDetails, setShippingDetails] = useState({ shippingCharge: 0, codCharge: 0, totalDeliveryCharge: 0 });
 
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [showNewAddressForm, setShowNewAddressForm] = useState(false);
@@ -51,9 +55,10 @@ export default function Cart() {
     const handleSelectSavedAddress = (addr) => {
         setSelectedAddressId(addr.id);
         setAddress({
-            street: addr.street || '',
+            addressLine1: addr.addressLine1 || '',
             city: addr.city || '',
-            zip: addr.zip || '',
+            state: addr.state || '',
+            pincode: addr.pincode || '',
             phone: addr.phone || ''
         });
         setShowNewAddressForm(false);
@@ -62,7 +67,7 @@ export default function Cart() {
     const handleToggleNewAddress = () => {
         setShowNewAddressForm(true);
         setSelectedAddressId(null);
-        setAddress({ street: '', city: '', zip: '', phone: '' });
+        setAddress({ addressLine1: '', city: '', state: '', pincode: '', phone: '' });
     };
 
     const handleAddressChange = (e) => {
@@ -70,12 +75,33 @@ export default function Cart() {
         setAddress(prev => ({ ...prev, [name]: value }));
     };
 
+    // Recalculate shipping whenever address, total, or payment method changes
+    useEffect(() => {
+        if (address.state && address.city && cartItems.length > 0) {
+            // Calculate total weight (Assuming 100g per item if weight not specified)
+            const totalWeight = cartItems.reduce((acc, item) => {
+                const w = parseFloat(item.weight) || 100;
+                return acc + (w * item.quantity);
+            }, 0);
+
+            const result = calculateShipping({
+                state: address.state,
+                city: address.city,
+                weight: totalWeight,
+                orderValue: total
+            });
+            setShippingDetails(result);
+        } else {
+            setShippingDetails({ shippingCharge: 0, codCharge: 0, totalDeliveryCharge: 0 });
+        }
+    }, [address.state, address.city, cartItems, total]);
+
     const handleSaveNewAddress = async () => {
         if (!user) {
             setError('Please sign in to save an address.');
             return;
         }
-        if (!address.street || !address.city || !address.zip || !address.phone) {
+        if (!address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
             setError('Please fill in all address fields to save.');
             return;
         }
@@ -86,10 +112,10 @@ export default function Cart() {
             const saved = await saveAddress(user.id, {
                 type: 'Home',
                 name: user.name || 'Saved Address',
-                street: address.street,
+                addressLine1: address.addressLine1,
                 city: address.city,
-                state: '',
-                zip: address.zip,
+                state: address.state,
+                pincode: address.pincode,
                 phone: address.phone
             });
             const updatedAddresses = [...savedAddresses, saved];
@@ -110,17 +136,19 @@ export default function Cart() {
         }
 
         // Basic validation
-        if (!address.street || !address.city || !address.zip || !address.phone) {
+        if (!address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
             setError('Please fill in your delivery details.');
             return;
         }
+
+        const finalTotal = total + shippingDetails.totalDeliveryCharge;
 
         setIsProcessing(true);
         setError(null);
 
         try {
             const result = await initiatePayment({
-                amount: total,
+                amount: finalTotal,
                 customerName: user.name || 'Saga Customer',
                 customerEmail: user.email,
                 customerPhone: address.phone
@@ -131,8 +159,10 @@ export default function Cart() {
                 const savedOrder = await saveOrder({
                     userId: user.id,
                     items: cartItems,
-                    total: `₹${total.toLocaleString('en-IN')}`,
-                    rawTotal: total,
+                    total: `₹${finalTotal.toLocaleString('en-IN')}`,
+                    subtotal: total,
+                    shipping: shippingDetails.shippingCharge,
+                    rawTotal: finalTotal,
                     address: address,
                     paymentId: result.paymentId,
                     razorpayOrderId: result.orderId,
@@ -243,7 +273,7 @@ export default function Cart() {
                                     >
                                         {savedAddresses.map((addr) => (
                                             <option key={addr.id} value={addr.id}>
-                                                {addr.name} — {addr.street}, {addr.city} {addr.zip} | Ph: {addr.phone}
+                                                {addr.name} — {addr.addressLine1}, {addr.city} {addr.pincode} | Ph: {addr.phone}
                                             </option>
                                         ))}
                                         <option value="new">+ Deliver to a different address</option>
@@ -265,11 +295,11 @@ export default function Cart() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Street Address</label>
+                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 1</label>
                                             <input 
                                                 type="text" 
-                                                name="street"
-                                                value={address.street}
+                                                name="addressLine1"
+                                                value={address.addressLine1}
                                                 onChange={handleAddressChange}
                                                 placeholder="e.g. 123 Luxury Lane" 
                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
@@ -287,11 +317,22 @@ export default function Cart() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">ZIP Code</label>
+                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">State</label>
                                             <input 
                                                 type="text" 
-                                                name="zip"
-                                                value={address.zip}
+                                                name="state"
+                                                value={address.state}
+                                                onChange={handleAddressChange}
+                                                placeholder="e.g. Kerala" 
+                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode</label>
+                                            <input 
+                                                type="text" 
+                                                name="pincode"
+                                                value={address.pincode}
                                                 onChange={handleAddressChange}
                                                 placeholder="e.g. 400001" 
                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
@@ -312,7 +353,7 @@ export default function Cart() {
                                             <button
                                                 type="button"
                                                 onClick={handleSaveNewAddress}
-                                                disabled={isSavingAddress || !address.street || !address.city || !address.zip || !address.phone}
+                                                disabled={isSavingAddress}
                                                 className="bg-white text-black px-6 py-2 text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {isSavingAddress ? 'Saving...' : 'Save & Select Address'}
@@ -336,14 +377,14 @@ export default function Cart() {
                                 </div>
                                 <div className="flex justify-between text-zinc-400">
                                     <span>Shipping</span>
-                                    <span className="text-green-400">Free</span>
+                                    <span className="text-white">₹{shippingDetails.shippingCharge.toLocaleString('en-IN')}</span>
                                 </div>
                             </div>
                             
                             <div className="border-t border-zinc-800 pt-4 mb-8">
                                 <div className="flex justify-between items-center text-lg">
                                     <span>Total</span>
-                                    <span className="font-bold">₹{total.toLocaleString('en-IN')}</span>
+                                    <span className="font-bold">₹{(total + shippingDetails.totalDeliveryCharge).toLocaleString('en-IN')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-500 mt-2">Including all taxes</p>
                             </div>

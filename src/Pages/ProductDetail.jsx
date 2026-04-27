@@ -102,7 +102,9 @@ const ProductDetail = () => {
       <div className="max-w-7xl mx-auto px-6 mb-8 text-zinc-300 text-sm font-medium">
         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
         <span className="mx-2 text-zinc-500">•</span>
-        <Link to={`/${product.category.toLowerCase()}s`} className="hover:text-primary transition-colors">{product.category}</Link>
+        <Link to={`/${product.category.toLowerCase()}s`} className="hover:text-primary transition-colors">
+          {product.category === 'Bracelets' ? 'Gold Plated' : product.category === 'Bangles' ? 'Bracelets' : product.category}
+        </Link>
         <span className="mx-2 text-zinc-500">•</span>
         <span className="text-white drop-shadow-sm">{product.name}</span>
       </div>
@@ -166,7 +168,7 @@ const ProductDetail = () => {
           <div className="flex flex-col space-y-6">
             <div>
               <span className="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-4 block drop-shadow-md">
-                {product.category} COLLECTION
+                {product.category === 'Bracelets' ? 'Gold Plated' : product.category === 'Bangles' ? 'Bracelets' : product.category} COLLECTION
               </span>
               <h1 className="text-white font-Great_Vibes text-4xl md:text-5xl tracking-wider font-medium leading-tight mb-2 drop-shadow-lg">
                 {product.name}
@@ -193,35 +195,17 @@ const ProductDetail = () => {
             </div>
 
             <div className="space-y-6">
-              <div>
-                <h3 className="text-white text-[10px] font-bold tracking-[0.2em] uppercase mb-2 opacity-100 flex items-center gap-3">
-                    <span className="w-6 h-[1px] bg-primary"></span>
-                    The Story
-                </h3>
-                <p className="text-zinc-100 text-lg font-Poppins leading-relaxed drop-shadow-sm">
-                  {product.description || "A masterfully crafted piece designed to capture the essence of sophistication and grace. Every curve and detail has been meticulously considered to create a harmony between tradition and modern style."}
-                </p>
-              </div>
+
 
               <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-white/10">
-                {product.material && (
-                  <div>
-                      <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Material</h3>
-                      <p className="text-white font-medium text-base">{product.material} {product.purity && `(${product.purity})`}</p>
-                  </div>
-                )}
+
                 {product.weight && (
                   <div>
                       <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Weight</h3>
                       <p className="text-white font-medium text-base">{product.weight}</p>
                   </div>
                 )}
-                {product.metalColor && (
-                  <div>
-                      <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Metal Color</h3>
-                      <p className="text-white font-medium text-base">{product.metalColor}</p>
-                  </div>
-                )}
+
                 {product.gemstones && product.gemstones !== 'None' && (
                   <div>
                       <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Gemstones</h3>
@@ -234,13 +218,10 @@ const ProductDetail = () => {
                       <p className="text-white font-medium text-base">{product.sizes}</p>
                   </div>
                 )}
+
                 <div>
-                    <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Authenticity</h3>
-                    <p className="text-white font-medium text-base">Guaranteed Pure</p>
-                </div>
-                <div>
-                    <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Stock</h3>
-                    <p className="text-white font-medium text-base">{product.stock > 0 ? `${product.stock} units available` : 'Out of Stock'}</p>
+                    <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Availability</h3>
+                    <p className="text-white font-medium text-base">{product.stock > 0 ? 'In Stock' : 'Out of Stock'}</p>
                 </div>
               </div>
             </div>

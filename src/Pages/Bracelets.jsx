@@ -24,13 +24,13 @@ const Bracelets = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Bracelets...</div>
+        <div className="text-white text-xl">Loading Gold Plated Collection...</div>
       </div>
     );
   }
 
   return (
-    <ProductPageLayout title="Bracelets" products={products} />
+    <ProductPageLayout title="Gold Plated" products={products} />
   );
 };
 

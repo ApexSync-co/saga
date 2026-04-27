@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 
 // Static category data — matches the store's fixed categories and routes
 const CATEGORIES = [
-  { handle: 'bangles', title: 'Bangles', image: '/Bangles.png' },
-  { handle: 'bracelets', title: 'Bracelets', image: '/Bracelets.jpeg' },
-  { handle: 'earrings', title: 'Earrings', image: '/stock3.jpeg' },
+  { handle: 'bangles', title: 'Bracelets', image: '/Bangles.png' },
+  { handle: 'bracelets', title: 'Gold Plated', image: '/Bracelets.jpeg' },
+  { handle: 'earrings', title: 'Earrings', image: '/stock6.JPG' },
   { handle: 'necklaces', title: 'Necklaces', image: '/Necklace.jpeg' },
   { handle: 'pendants', title: 'Pendants', image: '/Pendant.jpeg' },
   { handle: 'rings', title: 'Rings', image: '/Rings.jpeg' },

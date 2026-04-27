@@ -24,14 +24,14 @@ const Bangles = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Bangles...</div>
+        <div className="text-white text-xl">Loading Bracelets Collection...</div>
       </div>
     );
   }
 
   return (
     <>
-      <ProductPageLayout title="Bangles" products={products} />
+      <ProductPageLayout title="Bracelets" products={products} />
     </>
   );
 };

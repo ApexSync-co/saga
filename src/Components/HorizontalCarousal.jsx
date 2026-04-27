@@ -34,7 +34,7 @@ export default function HorizontalCarousal() {
         <section className="py-16 overflow-hidden relative">
             <div className="px-6 mb-10 text-center">
                 <h2 className="font-Great_Vibes text-6xl md:text-8xl text-white mb-2">
-                    Trending One's
+                    Trending Ones
                 </h2>
                 <div className="flex items-center justify-center gap-3 text-zinc-300">
                     <div className="h-[1px] w-6 bg-primary/30" />

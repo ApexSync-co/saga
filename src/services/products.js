@@ -157,20 +157,20 @@ export async function fetchFestiveEdit() {
   // In the future, the admin can manage this through Firestore.
   return {
     carousel: [
-      { 
-        src: '/stock1.jpeg', 
+      {
+        src: '/stock1.jpeg',
         alt: 'Festive Look 1',
         title: 'Make Your Moments Beautiful',
         subtitle: 'Saga Exclusive'
       },
-        { 
-        src: '/stock2.jpeg', 
+      {
+        src: '/stock2.jpeg',
         alt: 'Festive Look 2',
         title: 'Crafting Timeless Memories',
         subtitle: 'The Art of Jewelry'
       },
-      { 
-        src: '/stock3.jpeg', 
+      {
+        src: '/stock3.jpeg',
         alt: 'Festive Look 3',
         title: 'Elegance for Every Occasion',
         subtitle: 'Curated Heritage'
@@ -180,8 +180,8 @@ export async function fetchFestiveEdit() {
       { src: '/stock1.jpeg', alt: 'Festive Look 1' },
       { src: '/stock2.jpeg', alt: 'Festive Look 2' },
       { src: '/Rings.jpeg', alt: 'Festive Look 3' },
-      { src: '/stock3.jpeg', alt: 'Festive Look 4' },
+      { src: '/stock4.jpg', alt: 'Festive Look 4' },
     ],
-    banner: { src: '/stock4.jpg', alt: 'Traditional Coming Soon' },
+    banner: { src: '/stock5.JPG', alt: 'Traditional Coming Soon' },
   };
 }

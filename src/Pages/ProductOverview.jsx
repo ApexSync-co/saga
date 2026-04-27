@@ -85,9 +85,7 @@ const ProductOverview = () => {
                   </p>
                 </div>
 
-                <p className="text-zinc-300 text-sm font-Poppins leading-relaxed mb-8 line-clamp-3 group-hover:text-white transition-colors">
-                  {product.description || "A masterfully crafted piece designed to capture the essence of sophistication and grace. Perfect for any occasion that calls for a touch of brilliance."}
-                </p>
+
 
                 <div className="mt-auto pt-6 border-t border-white/5">
                   <button 
