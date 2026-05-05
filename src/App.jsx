@@ -4,25 +4,44 @@ import Footer from './Components/Footer'
 import { Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 
-const Home = lazy(() => import('./Pages/Home'))
-const Bangles = lazy(() => import('./Pages/Bangles'))
-const Bracelets = lazy(() => import('./Pages/Bracelets'))
-const Earrings = lazy(() => import('./Pages/Earrings'))
-const Necklace = lazy(() => import('./Pages/Necklace'))
-const Pendant = lazy(() => import('./Pages/Pendant'))
-const Rings = lazy(() => import('./Pages/Rings'))
-const SignIn = lazy(() => import('./Pages/SignIn'))
-const SignUp = lazy(() => import('./Pages/SignUp'))
-const Cart = lazy(() => import('./Pages/Cart'))
-const DeliveryAddress = lazy(() => import('./Pages/NavbarPages/DeliveryAddress'))
-const Payment = lazy(() => import('./Pages/NavbarPages/Payment'))
-const Accounts = lazy(() => import('./Pages/NavbarPages/Accounts'))
-const Help = lazy(() => import('./Pages/NavbarPages/Help'))
-const MyOrders = lazy(() => import('./Pages/NavbarPages/MyOrders'))
-const Settings = lazy(() => import('./Pages/NavbarPages/Settings'))
-const ProductOverview = lazy(() => import('./Pages/ProductOverview'))
-const ProductDetail = lazy(() => import('./Pages/ProductDetail'))
-const OrderSuccess = lazy(() => import('./Pages/OrderSuccess'))
+const lazyWithRetry = (componentImport) =>
+  lazy(async () => {
+    const pageHasAlreadyBeenForceRefreshed = JSON.parse(
+      window.sessionStorage.getItem('page-has-been-force-refreshed') || 'false'
+    );
+    try {
+      const component = await componentImport();
+      window.sessionStorage.setItem('page-has-been-force-refreshed', 'false');
+      return component;
+    } catch (error) {
+      if (!pageHasAlreadyBeenForceRefreshed) {
+        window.sessionStorage.setItem('page-has-been-force-refreshed', 'true');
+        window.location.reload();
+        return;
+      }
+      throw error;
+    }
+  });
+
+const Home = lazyWithRetry(() => import('./Pages/Home'))
+const Bangles = lazyWithRetry(() => import('./Pages/Bangles'))
+const Bracelets = lazyWithRetry(() => import('./Pages/Bracelets'))
+const Earrings = lazyWithRetry(() => import('./Pages/Earrings'))
+const Necklace = lazyWithRetry(() => import('./Pages/Necklace'))
+const Pendant = lazyWithRetry(() => import('./Pages/Pendant'))
+const Rings = lazyWithRetry(() => import('./Pages/Rings'))
+const SignIn = lazyWithRetry(() => import('./Pages/SignIn'))
+const SignUp = lazyWithRetry(() => import('./Pages/SignUp'))
+const Cart = lazyWithRetry(() => import('./Pages/Cart'))
+const DeliveryAddress = lazyWithRetry(() => import('./Pages/NavbarPages/DeliveryAddress'))
+const Payment = lazyWithRetry(() => import('./Pages/NavbarPages/Payment'))
+const Accounts = lazyWithRetry(() => import('./Pages/NavbarPages/Accounts'))
+const Help = lazyWithRetry(() => import('./Pages/NavbarPages/Help'))
+const MyOrders = lazyWithRetry(() => import('./Pages/NavbarPages/MyOrders'))
+const Settings = lazyWithRetry(() => import('./Pages/NavbarPages/Settings'))
+const ProductOverview = lazyWithRetry(() => import('./Pages/ProductOverview'))
+const ProductDetail = lazyWithRetry(() => import('./Pages/ProductDetail'))
+const OrderSuccess = lazyWithRetry(() => import('./Pages/OrderSuccess'))
 
 // Loading component for Suspense
 const PageLoader = () => (
