@@ -102,7 +102,12 @@ const ProductDetail = () => {
       <div className="max-w-7xl mx-auto px-6 mb-8 text-zinc-300 text-sm font-medium">
         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
         <span className="mx-2 text-zinc-500">•</span>
-        <Link to={`/${product.category.toLowerCase()}s`} className="hover:text-primary transition-colors">{product.category}</Link>
+        <Link 
+          to={`/${product.category.toLowerCase().endsWith('s') ? product.category.toLowerCase() : product.category.toLowerCase() + 's'}`} 
+          className="hover:text-primary transition-colors"
+        >
+          {product.category}
+        </Link>
         <span className="mx-2 text-zinc-500">•</span>
         <span className="text-white drop-shadow-sm">{product.name}</span>
       </div>
