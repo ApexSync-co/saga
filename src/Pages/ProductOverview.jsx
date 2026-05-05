@@ -64,14 +64,23 @@ const ProductOverview = () => {
               <div className="relative h-80 overflow-hidden">
                 <img 
                   src={product.image} 
-                  alt={product.name} 
+                  alt="" aria-hidden="true"
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
-                <div className="absolute top-4 left-4">
-                  <span className="text-white text-[10px] font-bold tracking-[0.2em] uppercase bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  <span className="text-white text-[10px] font-bold tracking-[0.2em] uppercase bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 w-fit">
                     {product.category}
                   </span>
+                  {product.stock <= 5 && product.stock > 0 ? (
+                    <span className="text-orange-400 text-[10px] font-bold tracking-widest uppercase bg-orange-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-500/30 w-fit">
+                        Low Stock
+                    </span>
+                  ) : product.stock === 0 ? (
+                    <span className="text-red-400 text-[10px] font-bold tracking-widest uppercase bg-red-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-red-500/30 w-fit">
+                        Out of Stock
+                    </span>
+                  ) : null}
                 </div>
               </div>
 
@@ -85,9 +94,16 @@ const ProductOverview = () => {
                   </p>
                 </div>
 
-                <p className="text-zinc-300 text-sm font-Poppins leading-relaxed mb-8 line-clamp-3 group-hover:text-white transition-colors">
+                <p className="text-zinc-300 text-sm font-Poppins leading-relaxed mb-6 line-clamp-3 group-hover:text-white transition-colors">
                   {product.description || "A masterfully crafted piece designed to capture the essence of sophistication and grace. Perfect for any occasion that calls for a touch of brilliance."}
                 </p>
+
+                <div className="flex items-center gap-2 mb-6">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-green-400 opacity-80">
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                   </svg>
+                   <span className="text-xs text-zinc-400 uppercase tracking-widest font-semibold">Ships in 2-3 Days</span>
+                </div>
 
                 <div className="mt-auto pt-6 border-t border-white/5">
                   <button 

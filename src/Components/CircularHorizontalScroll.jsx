@@ -15,8 +15,7 @@ function CircularHorizontalScroll() {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
-  // Duplicate for infinite scroll effect
-  const categories = [...CATEGORIES, ...CATEGORIES];
+  const categories = CATEGORIES;
 
   const handleCategoryClick = (handle) => {
     navigate(`/${handle}`);
@@ -84,7 +83,7 @@ function CircularHorizontalScroll() {
               <div className="w-full h-full rounded-full overflow-hidden border-2 border-zinc-800 md:border-[3px] md:border-zinc-950 relative bg-zinc-900">
                 <img 
                   src={category.image} 
-                  alt={category.name} 
+                  alt="" aria-hidden="true" 
                   className="w-full h-full object-cover md:opacity-90 md:group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" 
                   loading="lazy"
                 />

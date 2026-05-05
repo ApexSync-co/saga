@@ -78,7 +78,7 @@ export default function HorizontalCarousal() {
                             >
                                 <img
                                     src={item.image}
-                                    alt={item.name}
+                                    alt="" aria-hidden="true"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                                     loading="lazy"
                                 />
