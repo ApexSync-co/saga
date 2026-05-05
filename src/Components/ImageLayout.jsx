@@ -15,7 +15,15 @@ const FestiveCarousel = ({ carousel }) => {
     if (!carousel) return null;
 
     return (
-        <div className="md:col-span-6 md:row-span-2 relative group overflow-hidden rounded-4xl md:rounded-[2rem] h-[50vh] md:h-auto shadow-2xl">
+        <div className="md:col-span-6 md:row-span-2 relative group overflow-hidden rounded-4xl md:rounded-[2rem] min-h-[60svh] md:h-auto shadow-2xl">
+            {/* Mobile Title Overlay */}
+            <div className="md:hidden absolute top-6 right-4 z-30 pointer-events-none">
+                <h2 className="text-white text-4xl tracking-wider leading-[0.8] text-right drop-shadow-lg flex flex-col gap-2">
+                    <span>Festive</span>
+                    <span>Edit</span>
+                </h2>
+            </div>
+
             {carousel.map((item, index) => (
                 <div 
                     key={index}
@@ -89,8 +97,9 @@ export default function ImageLayout(){
     }
 
     return(
-        <section className="w-[90vw] md:w-[85vw] lg:w-[75vw] m-auto md:py-16">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-12 px-4">
+        <section className="w-[93vw] md:w-[85vw] lg:w-[75vw] mt-4 md:mt-0 m-auto md:py-2">
+        
+            <div className="hidden md:flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-12 px-4">
                 <h1 className="text-primary text-6xl md:text-8xl lg:text-9xl font-Great_Vibes leading-[0.8] drop-shadow-2xl">
                     Festive Edit
                 </h1>
@@ -105,7 +114,7 @@ export default function ImageLayout(){
                 <FestiveCarousel carousel={content.carousel} />
 
                 {/* Item 2 */}
-                <div className="md:col-span-3 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[22vh] md:h-auto">
+                <div className="md:col-span-3 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[25dvh] md:h-auto">
                     {content.items[1] && (
                         <img 
                             src={content.items[1].src} 
@@ -117,7 +126,7 @@ export default function ImageLayout(){
                 </div>
 
                 {/* Item 3 */}
-                <div className="md:col-span-3 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[22vh] md:h-auto md:block hidden">
+                <div className="md:col-span-3 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[25dvh] md:h-auto md:block hidden">
                     {content.items[2] && (
                         <img 
                             src={content.items[2].src} 
@@ -129,7 +138,7 @@ export default function ImageLayout(){
                 </div>
 
                 {/* Item 4 */}
-                <div className="md:col-span-6 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[22vh] md:h-auto">
+                <div className="md:col-span-6 md:row-span-1 relative group overflow-hidden rounded-4xl md:rounded-3xl h-[25dvh] md:h-auto">
                     {content.items[3] && (
                         <img 
                             src={content.items[3].src} 
@@ -142,8 +151,8 @@ export default function ImageLayout(){
             </div>
 
             {/* Banner Section */}
-            <div className="mt-8 md:mt-12 relative h-[22vh] md:h-[45vh] rounded-4xl md:rounded-[2.5rem] overflow-hidden group cursor-pointer">
-                <div className="absolute inset-0 bg-black/30 md:bg-black/30 md:group-hover:bg-black/10 transition-colors duration-700 z-10" />
+            <div className="mt-4 md:mt-12 relative h-[25vh] md:h-[45vh] rounded-4xl md:rounded-[2.5rem] overflow-hidden group cursor-pointer mx-4 md:mx-0">
+                {/* <div className="absolute inset-0 bg-black/30 md:bg-black/30 md:group-hover:bg-black/10 transition-colors duration-700 z-10" /> */}
                 <h2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center text-5xl md:text-8xl font-Great_Vibes z-20 md:group-hover:scale-105 transition-transform duration-700 pointer-events-none w-full px-4">
                     Traditional Coming Soon
                 </h2> 

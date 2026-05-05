@@ -36,11 +36,8 @@ function App() {
 
   return (
     <>
-    <div className='min-h-screen'
-    style={{
-    minHeight: "100vh",
-    background: "linear-gradient(to bottom, #000000 0%, #1a0a00 20%, #5C2E00 45%, #A0521A 70%, #D4873A 100%)"
-  }}>
+    <div className='min-h-screen bg-linear-to-b from-black via-[#A0521A] to-black'
+  >
     <Navbar />
     <Suspense fallback={<PageLoader />}>
     <Routes>
