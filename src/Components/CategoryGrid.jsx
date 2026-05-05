@@ -8,6 +8,7 @@ const CATEGORIES = [
   { handle: 'necklaces', title: 'Necklaces', image: '/Necklace.jpeg' },
   { handle: 'pendants', title: 'Pendants', image: '/Pendant.jpeg' },
   { handle: 'rings', title: 'Rings', image: '/Rings.jpeg' },
+  { handle: 'sets', title: 'Sets', image: '/Sets.jpeg' },
 ];
 
 export default function CategoryGrid(){

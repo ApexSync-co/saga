@@ -26,6 +26,7 @@ function Footer() {
                         <Link to="/pendants" className="hover:text-white transition-colors duration-300">Pendants</Link>
                         <Link to="/rings" className="hover:text-white transition-colors duration-300">Rings</Link>
                         <Link to="/bracelets" className="hover:text-white transition-colors duration-300">Bracelets</Link>
+                        <Link to="/sets" className="hover:text-white transition-colors duration-300">Sets</Link>
                     </nav>
                 </div>
 

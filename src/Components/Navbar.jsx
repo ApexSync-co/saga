@@ -160,6 +160,7 @@ function Navbar(){
                              <Link to="/pendants" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Pendants</Link>
                              <Link to="/rings" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Rings</Link>
                              <Link to="/bracelets" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Bracelets</Link>
+                             <Link to="/sets" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Sets</Link>
                         </div>
                     </div>
 

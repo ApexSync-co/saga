@@ -7,8 +7,22 @@ import CircularHorizontalScroll from '../Components/CircularHorizontalScroll';
 const ProductOverview = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [sortOption, setSortOption] = useState('Featured');
   const { addToCart } = useCart();
   const navigate = useNavigate();
+
+  const filteredAndSortedProducts = [...products]
+    .filter(p => filterCategory === 'All' || (p.category && p.category.toLowerCase() === filterCategory.toLowerCase()))
+    .sort((a, b) => {
+        if (sortOption === 'Price: Low to High') {
+            return parseInt(a.price.replace(/[^0-9]/g, '')) - parseInt(b.price.replace(/[^0-9]/g, ''));
+        }
+        if (sortOption === 'Price: High to Low') {
+            return parseInt(b.price.replace(/[^0-9]/g, '')) - parseInt(a.price.replace(/[^0-9]/g, ''));
+        }
+        return 0;
+    });
 
   useEffect(() => {
     const getProducts = async () => {
@@ -53,9 +67,38 @@ const ProductOverview = () => {
         </p>
       </div>
 
+      <div className="max-w-7xl mx-auto mb-8 px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+        {/* Filter Scrollable Tabs */}
+        <div className="flex overflow-x-auto w-full md:w-auto no-scrollbar gap-2 pb-2 md:pb-0">
+          {['All', 'Bangles', 'Bracelets', 'Earrings', 'Necklaces', 'Pendants', 'Rings', 'Sets'].map(cat => (
+             <button 
+                key={cat}
+                onClick={() => setFilterCategory(cat)}
+                className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300 border border-white/5 ${filterCategory === cat ? 'bg-primary text-black shadow-[0_0_15px_rgba(251,112,16,0.3)]' : 'bg-white/5 text-zinc-300 hover:bg-white/15'}`}
+             >
+               {cat}
+             </button>
+          ))}
+        </div>
+
+        {/* Sort Dropdown */}
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+            <span className="text-zinc-400 text-sm font-medium tracking-wide">Sort:</span>
+            <select 
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="bg-black border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+            >
+                <option value="Featured">Featured</option>
+                <option value="Price: Low to High">Price: Low to High</option>
+                <option value="Price: High to Low">Price: High to Low</option>
+            </select>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {products.map((product) => (
+          {filteredAndSortedProducts.map((product) => (
             <div 
               key={product.id}
               onClick={() => navigate(`/product/${product.id}`)}
