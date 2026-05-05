@@ -28,8 +28,13 @@ export const initiatePayment = async ({ amount, customerName, customerEmail, cus
       }
 
       // 2. Configure Razorpay Options
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        throw new Error("Razorpay Key ID is not configured in environment variables.");
+      }
+
       const rzpOptions = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'YOUR_KEY_ID', // Better to get from backend or env
+        key: razorpayKey,
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Saga",
