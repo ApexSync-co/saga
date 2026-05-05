@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { initiatePayment } from '../services/paymentService';
 import { saveOrder } from '../services/orderService';
 import { fetchUserAddresses, saveAddress } from '../services/addressService';
+import { fetchProductById } from '../services/products';
 
 export default function Cart() {
     const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -119,6 +120,19 @@ export default function Cart() {
         setError(null);
 
         try {
+            // Pre-checkout stock validation
+            for (const item of cartItems) {
+                if (item.id) {
+                    const latestProductData = await fetchProductById(item.id);
+                    if (!latestProductData) {
+                        throw new Error(`Product "${item.name}" is no longer available.`);
+                    }
+                    if (latestProductData.stock < item.quantity) {
+                        throw new Error(`Sorry, we only have ${latestProductData.stock} left in stock for "${item.name}". Please reduce the quantity.`);
+                    }
+                }
+            }
+
             const result = await initiatePayment({
                 amount: total,
                 customerName: user.name || 'Saga Customer',

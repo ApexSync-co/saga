@@ -17,24 +17,11 @@ export default function OrderSuccess() {
         }
     }, [paymentId, navigate]);
 
-    const handleTrackOrder = async () => {
-        if (!awbNumber) {
-            alert("No tracking number available for this order yet.");
-            return;
-        }
-
-        setIsTracking(true);
-        try {
-            const data = await trackOrder(awbNumber);
-            setTrackingData(data);
-            setShowModal(true);
-            console.log("Tracking Data:", data);
-        } catch (error) {
-            console.error("Tracking error:", error);
-            alert("Failed to fetch tracking details. Please try again later.");
-        } finally {
-            setIsTracking(false);
-        }
+    const handleTrackOrder = () => {
+        const message = `Hi, I would like to track my order.\nOrder ID: ${orderId || paymentId}`;
+        const whatsappNumber = "919999999999"; // TODO: Replace with actual business WhatsApp number
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
     };
 
     return (

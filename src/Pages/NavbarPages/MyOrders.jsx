@@ -66,42 +66,11 @@ const MyOrders = () => {
         loadOrders();
     }, [user]);
 
-    const handleTrackOrder = async (order) => {
-        const awbNumber = order.awbNumber || 'V01197967'; // Using placeholder for testing
-        if (!awbNumber) {
-            alert("No tracking number available for this order.");
-            return;
-        }
-
-        setTrackingData(order);
-        try {
-            // Check if we have items in the order to show in the tracking view
-            const trackingMetadata = {
-                awbNumber,
-                items: order.items || [
-                    { name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' },
-                    { name: 'Saga Signature Ring', quantity: 1, image: '/ring.jpg' }
-                ]
-            };
-
-            const data = await trackOrder(awbNumber);
-            setTrackingData({ ...data, ...trackingMetadata });
-            setIsDemoTracking(false);
-        } catch (error) {
-            console.error("Tracking error:", error);
-            // Fallback for demo purposes as requested
-            setTrackingData({ 
-                awbNumber, 
-                status: "In Transit",
-                items: order.items || [
-                    { name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' },
-                    { name: 'Saga Signature Ring', quantity: 1, image: '/ring.jpg' }
-                ]
-            });
-            setIsDemoTracking(true);
-        } finally {
-            setLoading(false);
-        }
+    const handleTrackOrder = (order) => {
+        const message = `Hi, I would like to track my order.\nOrder ID: ${order.id}`;
+        const whatsappNumber = "919999999999"; // TODO: Replace with actual business WhatsApp number
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
     };
 
     if (loading) {

@@ -1,4 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -6,6 +8,8 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Load cart from sessionStorage on mount
   useEffect(() => {
@@ -34,6 +38,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = (product) => {
+    if (!user) {
+      alert("Please sign in before adding products to your cart.");
+      navigate('/signin');
+      return;
+    }
+
     setCartItems(prevItems => {
       // Check for existing item by ID and Name to avoid collision if IDs are reused across categories
       const existingItem = prevItems.find(item => item.id === product.id && item.name === product.name);
