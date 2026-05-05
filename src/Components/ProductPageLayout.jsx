@@ -7,8 +7,22 @@ const ProductPageLayout = ({ title, products }) => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
   const [showBlur, setShowBlur] = useState(false);
+  const [sortOption, setSortOption] = useState('Featured');
   const { addToCart } = useCart();
   const navigate = useNavigate();
+
+  const sortedProducts = [...products].sort((a, b) => {
+      if (sortOption === 'Price: Low to High') {
+          return parseInt(a.price.replace(/[^0-9]/g, '')) - parseInt(b.price.replace(/[^0-9]/g, ''));
+      }
+      if (sortOption === 'Price: High to Low') {
+          return parseInt(b.price.replace(/[^0-9]/g, '')) - parseInt(a.price.replace(/[^0-9]/g, ''));
+      }
+      if (sortOption === 'Top Rated') {
+          return (b.rating || 5) - (a.rating || 5);
+      }
+      return 0;
+  });
 
   useEffect(() => {
     let timeoutId;
@@ -52,15 +66,31 @@ const ProductPageLayout = ({ title, products }) => {
         </div>
       </div>
 
-      <div className="relative mb-20">
+      <div className="relative mb-12">
         <h1 className="text-white text-center font-Great_Vibes text-7xl md:text-9xl tracking-wider relative z-10 opacity-90 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
           {title}
         </h1>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-24 bg-primary/10 blur-[100px] pointer-events-none"></div>
       </div>
 
+      <div className="max-w-7xl mx-auto mb-10 flex justify-end px-4">
+        <div className="flex items-center gap-3">
+            <span className="text-zinc-400 text-sm font-medium tracking-wide">Sort:</span>
+            <select 
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+            >
+                <option value="Featured">Featured</option>
+                <option value="Price: Low to High">Price: Low to High</option>
+                <option value="Price: High to Low">Price: High to Low</option>
+                <option value="Top Rated">Top Rated</option>
+            </select>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto">
-        {products.map((item, index) => (
+        {sortedProducts.map((item, index) => (
           <div 
             key={item.id} 
             onMouseEnter={() => setHoveredId(item.id)}
@@ -77,7 +107,7 @@ const ProductPageLayout = ({ title, products }) => {
             <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden">
               <img 
                 src={item.image} 
-                alt={item.name} 
+                alt="" aria-hidden="true" 
                 className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
               />
               

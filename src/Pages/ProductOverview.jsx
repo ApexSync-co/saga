@@ -21,6 +21,9 @@ const ProductOverview = () => {
         if (sortOption === 'Price: High to Low') {
             return parseInt(b.price.replace(/[^0-9]/g, '')) - parseInt(a.price.replace(/[^0-9]/g, ''));
         }
+        if (sortOption === 'Top Rated') {
+            return (b.rating || 5) - (a.rating || 5);
+        }
         return 0;
     });
 
@@ -92,6 +95,7 @@ const ProductOverview = () => {
                 <option value="Featured">Featured</option>
                 <option value="Price: Low to High">Price: Low to High</option>
                 <option value="Price: High to Low">Price: High to Low</option>
+                <option value="Top Rated">Top Rated</option>
             </select>
         </div>
       </div>
