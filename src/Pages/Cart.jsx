@@ -144,6 +144,8 @@ export default function Cart() {
                 // SAVE THE ORDER TO FIRESTORE
                 const savedOrder = await saveOrder({
                     userId: user.id,
+                    customerName: user.name || 'Saga Customer',
+                    customerEmail: user.email || '',
                     items: cartItems,
                     total: `₹${total.toLocaleString('en-IN')}`,
                     rawTotal: total,
