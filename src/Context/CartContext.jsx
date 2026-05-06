@@ -4,25 +4,24 @@ import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [authAlert, setAuthAlert] = useState(false);
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  // Load cart from sessionStorage on mount
-  useEffect(() => {
+  const [cartItems, setCartItems] = useState(() => {
     const savedCart = sessionStorage.getItem('saga_cart');
     if (savedCart) {
       try {
-        setCartItems(JSON.parse(savedCart));
+        return JSON.parse(savedCart);
       } catch (error) {
         console.error("Failed to parse cart data", error);
       }
     }
-  }, []);
+    return [];
+  });
+  const [authAlert, setAuthAlert] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Save cart to sessionStorage whenever it changes
   useEffect(() => {

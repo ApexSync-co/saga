@@ -15,7 +15,10 @@ export default function Cart() {
     const [error, setError] = useState(null);
     const [address, setAddress] = useState({
         addressLine1: '',
+        addressLine2: '',
+        landmark: '',
         city: '',
+        state: '',
         pincode: '',
         phone: ''
     });
@@ -53,18 +56,27 @@ export default function Cart() {
         setSelectedAddressId(addr.id);
         setAddress({
             addressLine1: addr.addressLine1 || '',
+            addressLine2: addr.addressLine2 || '',
+            landmark: addr.landmark || '',
             city: addr.city || '',
+            state: addr.state || '',
             pincode: addr.pincode || '',
             phone: addr.phone || ''
         });
         setShowNewAddressForm(false);
     };
 
-    const handleToggleNewAddress = () => {
         setShowNewAddressForm(true);
         setSelectedAddressId(null);
-        setAddress({ addressLine1: '', city: '', pincode: '', phone: '' });
-    };
+        setAddress({ 
+            addressLine1: '', 
+            addressLine2: '',
+            landmark: '',
+            city: '', 
+            state: '',
+            pincode: '', 
+            phone: '' 
+        });
 
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
@@ -88,8 +100,10 @@ export default function Cart() {
                 type: 'Home',
                 name: user.name || 'Saved Address',
                 addressLine1: address.addressLine1,
+                addressLine2: address.addressLine2,
+                landmark: address.landmark,
                 city: address.city,
-                state: '',
+                state: address.state,
                 pincode: address.pincode,
                 phone: address.phone
             });
@@ -114,6 +128,7 @@ export default function Cart() {
         const missingFields = [];
         if (!address.addressLine1) missingFields.push('Address Line 1');
         if (!address.city) missingFields.push('City');
+        if (!address.state) missingFields.push('State');
         if (!address.pincode) missingFields.push('Pincode');
         if (!address.phone) missingFields.push('Phone');
 
@@ -287,49 +302,83 @@ export default function Cart() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 1</label>
-                                            <input 
-                                                type="text" 
-                                                name="addressLine1"
-                                                value={address.addressLine1}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. 123 Luxury Lane" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">City</label>
-                                            <input 
-                                                type="text" 
-                                                name="city"
-                                                value={address.city}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. Mumbai" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode</label>
-                                            <input 
-                                                type="text" 
-                                                name="pincode"
-                                                value={address.pincode}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. 690503" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Phone Number</label>
-                                            <input 
-                                                type="tel" 
-                                                name="phone"
-                                                value={address.phone}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. 9876543210" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 1</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="addressLine1"
+                                                 value={address.addressLine1}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. 123 Luxury Lane" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 2 (Optional)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="addressLine2"
+                                                 value={address.addressLine2}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Apartment, Suite, etc." 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Landmark (Optional)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="landmark"
+                                                 value={address.landmark}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Near Royal Palace" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">City</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="city"
+                                                 value={address.city}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Mumbai" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">State</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="state"
+                                                 value={address.state}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Maharashtra" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="pincode"
+                                                 value={address.pincode}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. 690503" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2 md:col-span-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Phone Number</label>
+                                             <input 
+                                                 type="tel" 
+                                                 name="phone"
+                                                 value={address.phone}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. 9876543210" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                    </div>
                                         <div className="md:col-span-2 pt-2 flex justify-end">
                                             <button
                                                 type="button"

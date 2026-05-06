@@ -58,7 +58,7 @@ const ProductPageLayout = ({ title, products }) => {
         setShowBlur(true);
       }, 1250);
     } else {
-      setShowBlur(false);
+      queueMicrotask(() => setShowBlur(false));
     }
     return () => clearTimeout(timer);
   }, [hoveredId, isScrolling]);
