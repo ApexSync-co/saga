@@ -14,9 +14,13 @@ export default function Cart() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
     const [address, setAddress] = useState({
-        street: '',
+        name: '',
+        addressLine1: '',
+        addressLine2: '',
+        landmark: '',
         city: '',
-        zip: '',
+        state: '',
+        pincode: '',
         phone: ''
     });
 
@@ -52,9 +56,13 @@ export default function Cart() {
     const handleSelectSavedAddress = (addr) => {
         setSelectedAddressId(addr.id);
         setAddress({
-            street: addr.street || '',
+            name: addr.name || '',
+            addressLine1: addr.addressLine1 || '',
+            addressLine2: addr.addressLine2 || '',
+            landmark: addr.landmark || '',
             city: addr.city || '',
-            zip: addr.zip || '',
+            state: addr.state || '',
+            pincode: addr.pincode || '',
             phone: addr.phone || ''
         });
         setShowNewAddressForm(false);
@@ -63,7 +71,16 @@ export default function Cart() {
     const handleToggleNewAddress = () => {
         setShowNewAddressForm(true);
         setSelectedAddressId(null);
-        setAddress({ street: '', city: '', zip: '', phone: '' });
+        setAddress({ 
+            name: user?.name || '',
+            addressLine1: '', 
+            addressLine2: '',
+            landmark: '',
+            city: '', 
+            state: '',
+            pincode: '', 
+            phone: '' 
+        });
     };
 
     const handleAddressChange = (e) => {
@@ -76,8 +93,8 @@ export default function Cart() {
             setError('Please sign in to save an address.');
             return;
         }
-        if (!address.street || !address.city || !address.zip || !address.phone) {
-            setError('Please fill in all address fields to save.');
+        if (!address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
+            setError('Please fill in all required address fields to save.');
             return;
         }
         
@@ -86,11 +103,13 @@ export default function Cart() {
         try {
             const saved = await saveAddress(user.id, {
                 type: 'Home',
-                name: user.name || 'Saved Address',
-                street: address.street,
+                name: address.name,
+                addressLine1: address.addressLine1,
+                addressLine2: address.addressLine2,
+                landmark: address.landmark,
                 city: address.city,
-                state: '',
-                zip: address.zip,
+                state: address.state,
+                pincode: address.pincode,
                 phone: address.phone
             });
             const updatedAddresses = [...savedAddresses, saved];
@@ -111,7 +130,7 @@ export default function Cart() {
         }
 
         // Basic validation
-        if (!address.street || !address.city || !address.zip || !address.phone) {
+        if (!address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
             setError('Please fill in your delivery details.');
             return;
         }
@@ -135,7 +154,7 @@ export default function Cart() {
 
             const result = await initiatePayment({
                 amount: total,
-                customerName: user.name || 'Saga Customer',
+                customerName: address.name || user.name || 'Saga Customer',
                 customerEmail: user.email,
                 customerPhone: address.phone
             });
@@ -144,7 +163,7 @@ export default function Cart() {
                 // SAVE THE ORDER TO FIRESTORE
                 const savedOrder = await saveOrder({
                     userId: user.id,
-                    customerName: user.name || 'Saga Customer',
+                    customerName: address.name || user.name || 'Saga Customer',
                     customerEmail: user.email || '',
                     items: cartItems,
                     total: `₹${total.toLocaleString('en-IN')}`,
@@ -259,7 +278,7 @@ export default function Cart() {
                                     >
                                         {savedAddresses.map((addr) => (
                                             <option key={addr.id} value={addr.id}>
-                                                {addr.name} — {addr.street}, {addr.city} {addr.zip} | Ph: {addr.phone}
+                                                {addr.name} — {addr.addressLine1}, {addr.city} {addr.pincode} | Ph: {addr.phone}
                                             </option>
                                         ))}
                                         <option value="new">+ Deliver to a different address</option>
@@ -280,55 +299,99 @@ export default function Cart() {
                                         )}
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2 md:col-span-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Full Name</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="name"
+                                                 value={address.name}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Rahul Sharma" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Street Address</label>
-                                            <input 
-                                                type="text" 
-                                                name="street"
-                                                value={address.street}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. 123 Luxury Lane" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">City</label>
-                                            <input 
-                                                type="text" 
-                                                name="city"
-                                                value={address.city}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. Mumbai" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">ZIP Code</label>
-                                            <input 
-                                                type="text" 
-                                                name="zip"
-                                                value={address.zip}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. 400001" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs text-zinc-400 uppercase tracking-widest">Phone Number</label>
-                                            <input 
-                                                type="tel" 
-                                                name="phone"
-                                                value={address.phone}
-                                                onChange={handleAddressChange}
-                                                placeholder="e.g. 9876543210" 
-                                                className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                            />
-                                        </div>
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 1</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="addressLine1"
+                                                 value={address.addressLine1}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="House No, Building, Street" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 2 (Optional)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="addressLine2"
+                                                 value={address.addressLine2}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="Area, Colony, Sector" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Landmark (Optional)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="landmark"
+                                                 value={address.landmark}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="Near Apollo Hospital" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">City</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="city"
+                                                 value={address.city}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Mumbai" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">State</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="state"
+                                                 value={address.state}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Maharashtra" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode (6-digit)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="pincode"
+                                                 value={address.pincode}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. 690503" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2 md:col-span-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Phone Number</label>
+                                             <input 
+                                                 type="tel" 
+                                                 name="phone"
+                                                 value={address.phone}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="10-digit mobile number" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
                                         <div className="md:col-span-2 pt-2 flex justify-end">
                                             <button
                                                 type="button"
                                                 onClick={handleSaveNewAddress}
-                                                disabled={isSavingAddress || !address.street || !address.city || !address.zip || !address.phone}
+                                                disabled={isSavingAddress || !address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone}
                                                 className="bg-white text-black px-6 py-2 text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {isSavingAddress ? 'Saving...' : 'Save & Select Address'}
