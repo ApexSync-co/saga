@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { trackOrder } from '../services/trackingService';
 import TrackingDisplay from '../Components/TrackingDisplay';
 
 export default function OrderSuccess() {
     const location = useLocation();
     const navigate = useNavigate();
     const { orderId, paymentId, awbNumber } = location.state || {};
-    const [trackingData, setTrackingData] = useState(null);
-    const [isTracking, setIsTracking] = useState(false);
+    const [trackingData] = useState(null);
+    const [isTracking] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {

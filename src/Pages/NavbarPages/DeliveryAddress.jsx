@@ -136,7 +136,7 @@ const DeliveryAddress = () => {
             await setDefaultAddress(user.id, id);
             const data = await fetchUserAddresses(user.id);
             setAddresses(data);
-        } catch (error) {
+        } catch {
             alert("Failed to set default address.");
         }
     };
@@ -146,7 +146,7 @@ const DeliveryAddress = () => {
             try {
                 await removeAddress(id);
                 setAddresses(addresses.filter(addr => addr.id !== id));
-            } catch (error) {
+            } catch {
                 alert("Failed to delete address.");
             }
         }

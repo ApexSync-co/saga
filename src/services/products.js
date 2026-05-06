@@ -159,29 +159,29 @@ export async function fetchFestiveEdit() {
     carousel: [
       { 
         src: '/stock1.jpeg', 
-        alt: 'Festive Look 1',
+        alt: '',
         title: 'Make Your Moments Beautiful',
         subtitle: 'Saga Exclusive'
       },
         { 
         src: '/stock2.jpeg', 
-        alt: 'Festive Look 2',
+        alt: '',
         title: 'Crafting Timeless Memories',
         subtitle: 'The Art of Jewelry'
       },
       { 
         src: '/stock3.jpeg', 
-        alt: 'Festive Look 3',
+        alt: '',
         title: 'Elegance for Every Occasion',
         subtitle: 'Curated Heritage'
       },
     ],
     items: [
-      { src: '/stock1.jpeg', alt: 'Festive Look 1' },
-      { src: '/stock2.jpeg', alt: 'Festive Look 2' },
-      { src: '/Rings.jpeg', alt: 'Festive Look 3' },
-      { src: '/stock3.jpeg', alt: 'Festive Look 4' },
+      { src: '/stock1.jpeg', alt: '' },
+      { src: '/stock2.jpeg', alt: '' },
+      { src: '/Rings.jpeg', alt: '' },
+      { src: '/stock3.jpeg', alt: '' },
     ],
-    banner: { src: '/stock4.jpg', alt: 'Traditional Coming Soon' },
+    banner: { src: '/stock4.jpg', alt: '' },
   };
 }

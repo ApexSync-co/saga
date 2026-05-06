@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser, onAuthChange, logoutCustomer } from '../services/authService';
+import { onAuthChange, logoutCustomer } from '../services/authService';
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {

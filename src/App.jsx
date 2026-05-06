@@ -30,6 +30,7 @@ const Earrings = lazyWithRetry(() => import('./Pages/Earrings'))
 const Necklace = lazyWithRetry(() => import('./Pages/Necklace'))
 const Pendant = lazyWithRetry(() => import('./Pages/Pendant'))
 const Rings = lazyWithRetry(() => import('./Pages/Rings'))
+const Sets = lazyWithRetry(() => import('./Pages/Sets'))
 const SignIn = lazyWithRetry(() => import('./Pages/SignIn'))
 const SignUp = lazyWithRetry(() => import('./Pages/SignUp'))
 const Cart = lazyWithRetry(() => import('./Pages/Cart'))
@@ -69,6 +70,7 @@ function App() {
       <Route path="/necklaces" element={<Necklace />} />
       <Route path="/pendants" element={<Pendant />} />
       <Route path="/rings" element={<Rings />} />
+      <Route path="/sets" element={<Sets />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/cart" element={<Cart />} />

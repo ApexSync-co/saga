@@ -63,7 +63,7 @@ function Navbar(){
 
            <Link to="/" className="flex items-center justify-center group">
                 <div className="relative">
-                    <img src="/Logo.png" alt="SAGA Logo" className='md:h-16 h-12 relative z-10 group-hover:scale-105 transition-transform duration-300 drop-shadow-lg filter brightness-110 contrast-125' />
+                    <img src="/Logo.png" alt="" aria-label="Saga Home" className='md:h-16 h-12 relative z-10 group-hover:scale-105 transition-transform duration-300 drop-shadow-lg filter brightness-110 contrast-125' />
                 </div>
             </Link>
 
@@ -127,7 +127,7 @@ function Navbar(){
                        </div>
                     ) : (
                        <>
-                        <img src="/SAGA LOGO.PNG" alt="Saga Logo" className="h-14 w-auto object-contain rounded-lg mb-4 drop-shadow-lg filter brightness-110 contrast-125" />
+                        <img src="/SAGA LOGO.PNG" alt="" aria-hidden="true" className="h-14 w-auto object-contain rounded-lg mb-4 drop-shadow-lg filter brightness-110 contrast-125" />
                         <p className="text-white/70 text-sm font-semibold mb-2 max-w-[200px]">
                             Discover Elegance
                         </p>
@@ -153,6 +153,15 @@ function Navbar(){
                                 <span className="text-sm font-medium">Shop</span>
                             </li>
                         </Link>
+                        <div className="pl-[72px] flex flex-col gap-3 mt-1 pb-2">
+                             <Link to="/necklaces" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Necklaces</Link>
+                             <Link to="/bangles" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Bangles</Link>
+                             <Link to="/earrings" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Earrings</Link>
+                             <Link to="/pendants" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Pendants</Link>
+                             <Link to="/rings" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Rings</Link>
+                             <Link to="/bracelets" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Bracelets</Link>
+                             <Link to="/sets" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Sets</Link>
+                        </div>
                     </div>
 
                     {isAuthenticated && (

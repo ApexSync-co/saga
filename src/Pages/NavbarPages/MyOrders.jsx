@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
 import { fetchUserOrders } from '../../services/orderService';
-import { trackOrder } from '../../services/trackingService';
 import TrackingDisplay from '../../Components/TrackingDisplay';
 
 const MyOrders = () => {
@@ -9,7 +8,7 @@ const MyOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [trackingData, setTrackingData] = useState(null);
-    const [isDemoTracking, setIsDemoTracking] = useState(false);
+    const [isDemoTracking] = useState(false);
 
     useEffect(() => {
         const loadOrders = async () => {

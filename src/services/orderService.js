@@ -7,7 +7,6 @@
 import { db } from './firebase';
 import {
   collection,
-  addDoc,
   getDocs,
   query,
   where,
@@ -88,7 +87,7 @@ export async function fetchUserOrders(userId) {
             ...doc.data(),
             date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Recently',
           }));
-    } catch (e) {
+    } catch {
         return [];
     }
   }
