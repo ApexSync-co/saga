@@ -14,6 +14,7 @@ export default function Cart() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
     const [address, setAddress] = useState({
+        name: '',
         addressLine1: '',
         addressLine2: '',
         landmark: '',
@@ -55,6 +56,7 @@ export default function Cart() {
     const handleSelectSavedAddress = (addr) => {
         setSelectedAddressId(addr.id);
         setAddress({
+            name: addr.name || '',
             addressLine1: addr.addressLine1 || '',
             addressLine2: addr.addressLine2 || '',
             landmark: addr.landmark || '',
@@ -69,6 +71,7 @@ export default function Cart() {
         setShowNewAddressForm(true);
         setSelectedAddressId(null);
         setAddress({ 
+            name: user?.name || '',
             addressLine1: '', 
             addressLine2: '',
             landmark: '',
@@ -88,8 +91,8 @@ export default function Cart() {
             setError('Please sign in to save an address.');
             return;
         }
-        if (!address.addressLine1 || !address.city || !address.pincode || !address.phone) {
-            setError('Please fill in all address fields to save.');
+        if (!address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
+            setError('Please fill in all required address fields to save.');
             return;
         }
         
@@ -98,7 +101,7 @@ export default function Cart() {
         try {
             const saved = await saveAddress(user.id, {
                 type: 'Home',
-                name: user.name || 'Saved Address',
+                name: address.name,
                 addressLine1: address.addressLine1,
                 addressLine2: address.addressLine2,
                 landmark: address.landmark,
@@ -126,6 +129,7 @@ export default function Cart() {
 
         // Basic validation
         const missingFields = [];
+        if (!address.name) missingFields.push('Full Name');
         if (!address.addressLine1) missingFields.push('Address Line 1');
         if (!address.city) missingFields.push('City');
         if (!address.state) missingFields.push('State');
@@ -301,6 +305,17 @@ export default function Cart() {
                                         )}
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2 md:col-span-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Full Name</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="name"
+                                                 value={address.name}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Rahul Sharma" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
                                         <div className="space-y-2">
                                              <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 1</label>
                                              <input 
@@ -308,7 +323,7 @@ export default function Cart() {
                                                  name="addressLine1"
                                                  value={address.addressLine1}
                                                  onChange={handleAddressChange}
-                                                 placeholder="e.g. 123 Luxury Lane" 
+                                                 placeholder="House No, Building, Street" 
                                                  className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
                                              />
                                          </div>
@@ -319,7 +334,7 @@ export default function Cart() {
                                                  name="addressLine2"
                                                  value={address.addressLine2}
                                                  onChange={handleAddressChange}
-                                                 placeholder="e.g. Apartment, Suite, etc." 
+                                                 placeholder="Area, Colony, Sector" 
                                                  className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
                                              />
                                          </div>
@@ -330,7 +345,7 @@ export default function Cart() {
                                                  name="landmark"
                                                  value={address.landmark}
                                                  onChange={handleAddressChange}
-                                                 placeholder="e.g. Near Royal Palace" 
+                                                 placeholder="Near Apollo Hospital" 
                                                  className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
                                              />
                                          </div>
@@ -357,7 +372,7 @@ export default function Cart() {
                                              />
                                          </div>
                                          <div className="space-y-2">
-                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode</label>
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode (6-digit)</label>
                                              <input 
                                                  type="text" 
                                                  name="pincode"
@@ -374,7 +389,7 @@ export default function Cart() {
                                                  name="phone"
                                                  value={address.phone}
                                                  onChange={handleAddressChange}
-                                                 placeholder="e.g. 9876543210" 
+                                                 placeholder="10-digit mobile number" 
                                                  className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
                                              />
                                          </div>
