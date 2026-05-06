@@ -394,16 +394,15 @@ export default function Cart() {
                                              />
                                          </div>
                                     </div>
-                                        <div className="md:col-span-2 pt-2 flex justify-end">
-                                            <button
-                                                type="button"
-                                                onClick={handleSaveNewAddress}
-                                                disabled={isSavingAddress || !address.addressLine1 || !address.city || !address.pincode || !address.phone}
-                                                className="bg-white text-black px-6 py-2 text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                {isSavingAddress ? 'Saving...' : 'Save & Select Address'}
-                                            </button>
-                                        </div>
+                                    <div className="md:col-span-2 pt-2 flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={handleSaveNewAddress}
+                                            disabled={isSavingAddress || !address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone}
+                                            className="bg-white text-black px-6 py-2 text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isSavingAddress ? 'Saving...' : 'Save & Select Address'}
+                                        </button>
                                     </div>
                                 </div>
                             )}
