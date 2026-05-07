@@ -9,7 +9,7 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
-    const savedCart = sessionStorage.getItem('saga_cart');
+    const savedCart = localStorage.getItem('saga_cart');
     if (savedCart) {
       try {
         return JSON.parse(savedCart);
@@ -23,9 +23,9 @@ export const CartProvider = ({ children }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Save cart to sessionStorage whenever it changes
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    sessionStorage.setItem('saga_cart', JSON.stringify(cartItems));
+    localStorage.setItem('saga_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
   const parsePrice = (price) => {
@@ -79,6 +79,10 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
+  const importCart = (items) => {
+    setCartItems(items);
+  };
+
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
         const price = parsePrice(item.price);
@@ -103,7 +107,8 @@ export const CartProvider = ({ children }) => {
       updateQuantity, 
       clearCart, 
       getCartTotal,
-      getCartCount
+      getCartCount,
+      importCart
     }}>
       {children}
       {authAlert && (

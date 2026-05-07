@@ -6,12 +6,19 @@ import { initiatePayment } from '../services/paymentService';
 import { saveOrder } from '../services/orderService';
 import { fetchUserAddresses, saveAddress } from '../services/addressService';
 import { fetchProductById } from '../services/products';
+import { shareCart, getSharedCart } from '../services/sharingService';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Cart() {
-    const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart, importCart } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
+    const [shareUrl, setShareUrl] = useState(null);
+    const [sharedCartData, setSharedCartData] = useState(null);
+    const [isImporting, setIsImporting] = useState(false);
     const [error, setError] = useState(null);
     const [address, setAddress] = useState({
         name: '',
@@ -31,6 +38,52 @@ export default function Cart() {
 
     const total = getCartTotal();
 
+    useEffect(() => {
+        const sharedId = searchParams.get('sharedId');
+        if (sharedId) {
+            const loadSharedCart = async () => {
+                setIsImporting(true);
+                const items = await getSharedCart(sharedId);
+                if (items) {
+                    setSharedCartData(items);
+                }
+                setIsImporting(false);
+            };
+            loadSharedCart();
+        }
+    }, [searchParams]);
+
+    const handleImportSharedCart = () => {
+        if (sharedCartData) {
+            importCart(sharedCartData);
+            setSharedCartData(null);
+            setSearchParams({}); // Clear the URL
+        }
+    };
+
+    const handleShareCart = async () => {
+        if (cartItems.length === 0) return;
+        setIsSharing(true);
+        try {
+            const shareId = await shareCart(cartItems);
+            const url = `${window.location.origin}${window.location.pathname}?sharedId=${shareId}`;
+            setShareUrl(url);
+            
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'Saga Jewelry - Shared Cart',
+                    text: 'Check out these luxury pieces I found at Saga!',
+                    url: url
+                });
+            } else {
+                await navigator.clipboard.writeText(url);
+            }
+        } catch (err) {
+            console.error("Sharing failed:", err);
+        } finally {
+            setIsSharing(false);
+        }
+    };
     useEffect(() => {
         const loadDefaultAddress = async () => {
             if (user?.id) {
@@ -67,7 +120,7 @@ export default function Cart() {
         });
         setShowNewAddressForm(false);
     };
-
+    const handleToggleNewAddress = () => {
         setShowNewAddressForm(true);
         setSelectedAddressId(null);
         setAddress({ 
@@ -80,6 +133,7 @@ export default function Cart() {
             pincode: '', 
             phone: '' 
         });
+    };
 
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
@@ -195,7 +249,9 @@ export default function Cart() {
         }
     };
 
-    if (cartItems.length === 0) {
+    const sharedId = searchParams.get('sharedId');
+
+    if (cartItems.length === 0 && !sharedCartData && !sharedId) {
         return (
             <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center pt-20">
                 <h2 className="text-4xl font-Great_Vibes mb-4">Your Cart is Empty</h2>
@@ -211,6 +267,35 @@ export default function Cart() {
         <div className="min-h-screen bg-black text-white pt-28 pb-10 px-4">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-5xl font-Great_Vibes text-center mb-12">Shopping Cart</h1>
+
+                {isImporting && (
+                    <div className="flex justify-center py-12">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                )}
+
+                {sharedCartData && (
+                    <div className="bg-primary/10 border border-primary/30 p-6 rounded-sm mb-12 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div>
+                            <h3 className="text-xl font-medium text-white mb-1">Shared Cart Detected</h3>
+                            <p className="text-zinc-400 text-sm">Someone shared {sharedCartData.length} items with you. Would you like to view them?</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={() => setSharedCartData(null)}
+                                className="px-6 py-2 border border-white/20 text-white text-sm hover:bg-white/5 transition-colors"
+                            >
+                                IGNORE
+                            </button>
+                            <button 
+                                onClick={handleImportSharedCart}
+                                className="px-6 py-2 bg-primary text-white text-sm font-medium hover:bg-primary/80 transition-colors"
+                            >
+                                LOAD SHARED CART
+                            </button>
+                        </div>
+                    </div>
+                )}
                 
                 <div className="flex flex-col lg:flex-row gap-12">
                     {/* Cart Items List */}
@@ -454,6 +539,26 @@ export default function Cart() {
                             >
                                 Clear Cart
                             </button>
+
+                            <div className="mt-8 pt-8 border-t border-zinc-800">
+                                <button
+                                    onClick={handleShareCart}
+                                    disabled={isSharing}
+                                    className="w-full flex items-center justify-center gap-2 text-zinc-400 hover:text-primary transition-colors text-sm py-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                    </svg>
+                                    {isSharing ? 'Generating Link...' : 'Share this Cart'}
+                                </button>
+                                {shareUrl && !navigator.share && (
+                                    <p className="text-[10px] text-green-500 text-center mt-2 animate-pulse">Link copied to clipboard!</p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
