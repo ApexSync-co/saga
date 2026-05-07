@@ -193,5 +193,14 @@ export async function fetchFestiveEdit() {
       { src: '/stock3.jpeg', alt: '' },
     ],
     banner: { src: '/stock4.jpg', alt: '' },
+    categories: [
+      { id: 'sets', name: 'Sets', image: '/Sets.jpg', subtitle: 'Complete heritage ensembles' },
+      { id: 'necklaces', name: 'Necklaces', image: '/Necklace.jpeg', subtitle: 'Majestic neckpieces' },
+      { id: 'earrings', name: 'Earrings', image: '/stock3.jpeg', subtitle: 'Radiance for your ears' },
+      { id: 'bangles', name: 'Bangles', image: '/Bangles.png', subtitle: 'Exquisite wrist adornments' },
+      { id: 'bracelets', name: 'Bracelets', image: '/Bracelets.jpeg', subtitle: 'Elegant modern classics' },
+      { id: 'pendants', name: 'Pendants', image: '/Pendant.jpeg', subtitle: 'Heartfelt brilliance' },
+      { id: 'rings', name: 'Rings', image: '/Rings.jpeg', subtitle: 'Symbols of eternity' },
+    ]
   };
 }

@@ -2,24 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../Context/CartContext';
 import CircularHorizontalScroll from './CircularHorizontalScroll';
-
-const CATEGORY_METADATA = {
-  'Bangles': { image: '/Bangles.png', subtitle: 'Exquisite wrist adornments' },
-  'Bracelets': { image: '/Bracelets.jpeg', subtitle: 'Elegant modern classics' },
-  'Earrings': { image: '/stock3.jpeg', subtitle: 'Radiance for your ears' },
-  'Necklaces': { image: '/Necklace.jpeg', subtitle: 'Majestic neckpieces' },
-  'Pendants': { image: '/Pendant.jpeg', subtitle: 'Heartfelt brilliance' },
-  'Rings': { image: '/Rings.jpeg', subtitle: 'Symbols of eternity' },
-  'Sets': { image: '/Sets.jpg', subtitle: 'Complete heritage ensembles' },
-};
+import { fetchFestiveEdit } from '../services/products';
 
 const ProductPageLayout = ({ title, products }) => {
+  const [config, setConfig] = useState(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
   const [showBlur, setShowBlur] = useState(false);
   const [sortOption, setSortOption] = useState('Featured');
   const { addToCart } = useCart();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      const data = await fetchFestiveEdit();
+      if (data && data.categories) {
+        // Convert array to the map format expected by the component
+        const metadataMap = {};
+        data.categories.forEach(cat => {
+          metadataMap[cat.name] = { image: cat.image, subtitle: cat.subtitle };
+        });
+        setConfig(metadataMap);
+      }
+    };
+    loadConfig();
+  }, []);
 
   const sortedProducts = [...products].sort((a, b) => {
       if (sortOption === 'Price: Low to High') {
@@ -81,7 +88,7 @@ const ProductPageLayout = ({ title, products }) => {
         {/* Hero Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={CATEGORY_METADATA[title]?.image || '/stock1.jpeg'} 
+            src={config?.[title]?.image || '/stock1.jpeg'} 
             alt="" 
             className="w-full h-full object-cover scale-110 md:scale-105"
           />
@@ -101,7 +108,7 @@ const ProductPageLayout = ({ title, products }) => {
           </h1>
           
           <p className="text-zinc-300 text-[10px] md:text-lg font-Poppins tracking-[0.15em] md:tracking-[0.2em] uppercase opacity-70 max-w-[250px] md:max-w-none mx-auto">
-            {CATEGORY_METADATA[title]?.subtitle || 'Curated pieces of elegance'}
+            {config?.[title]?.subtitle || 'Curated pieces of elegance'}
           </p>
         </div>
       </div>
