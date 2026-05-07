@@ -1,6 +1,8 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { db } from '../services/firebase';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const CartContext = createContext();
 
@@ -9,12 +11,13 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
+    // Initial load from localStorage (works for both guests and logged-in users during hydration)
     const savedCart = localStorage.getItem('saga_cart');
     if (savedCart) {
       try {
         return JSON.parse(savedCart);
       } catch (error) {
-        console.error("Failed to parse cart data", error);
+        console.error("Failed to parse local cart data", error);
       }
     }
     return [];
@@ -23,10 +26,46 @@ export const CartProvider = ({ children }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Save cart to localStorage whenever it changes
+  // Load cart from Firestore when user logs in
   useEffect(() => {
+    if (!user) return;
+
+    // If user exists and has a UID, listen to Firestore updates
+    if (user && user.uid) {
+      const cartRef = doc(db, 'carts', user.uid);
+      const unsubscribe = onSnapshot(cartRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const cloudItems = docSnap.data().items || [];
+          setCartItems(cloudItems);
+          // Also update localStorage so it's ready on next refresh
+          localStorage.setItem('saga_cart', JSON.stringify(cloudItems));
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
+
+  // Sync cart to Cloud (Firestore) and LocalStorage
+  useEffect(() => {
+    // Always save to localStorage for persistence on refresh
     localStorage.setItem('saga_cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+
+    if (user && user.uid) {
+      const syncToCloud = async () => {
+        try {
+          const cartRef = doc(db, 'carts', user.uid);
+          await setDoc(cartRef, { 
+            items: cartItems,
+            updatedAt: new Date()
+          }, { merge: true });
+        } catch (error) {
+          console.error("Error syncing cart to cloud:", error);
+        }
+      };
+      syncToCloud();
+    }
+  }, [cartItems, user]);
 
   const parsePrice = (price) => {
     if (typeof price === 'number') return price;

@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 
 const ADDRESSES_COLLECTION = 'addresses';
+const LOCAL_ADDRESS_KEY = 'saga_addresses';
 
 /**
  * Validates address data for DTDC compatibility
@@ -60,12 +61,20 @@ const normalizeAddress = (addressData) => ({
 export async function saveAddress(userId, addressData) {
   try {
     const normalized = normalizeAddress(addressData);
+    
+    // Save to Firestore (Primary)
     const docRef = await addDoc(collection(db, ADDRESSES_COLLECTION), {
       userId,
       ...normalized,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+
+    // Mirror to LocalStorage (Efficient Cache)
+    const localAddresses = JSON.parse(localStorage.getItem(LOCAL_ADDRESS_KEY) || '[]');
+    localAddresses.push({ id: docRef.id, userId, ...normalized });
+    localStorage.setItem(LOCAL_ADDRESS_KEY, JSON.stringify(localAddresses));
+
     return { id: docRef.id, ...normalized };
   } catch (error) {
     console.error("Error saving address:", error);
@@ -75,18 +84,25 @@ export async function saveAddress(userId, addressData) {
 
 export async function fetchUserAddresses(userId) {
   try {
+    // Try LocalStorage first (Efficiency)
+    const cached = localStorage.getItem(LOCAL_ADDRESS_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached).filter(addr => addr.userId === userId);
+      if (parsed.length > 0) return parsed.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+    }
+
+    // Fallback to Firestore
     const q = query(
       collection(db, ADDRESSES_COLLECTION),
       where('userId', '==', userId)
     );
     const snapshot = await getDocs(q);
-    // Sort by default first, then by creation date
-    return snapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
-      .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+    const addresses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Update Cache
+    localStorage.setItem(LOCAL_ADDRESS_KEY, JSON.stringify(addresses));
+
+    return addresses.sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
   } catch (error) {
     console.error("Error fetching addresses:", error);
     return [];
