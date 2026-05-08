@@ -12,6 +12,8 @@ import {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 
 /**
@@ -81,6 +83,33 @@ export async function loginCustomer(email, password) {
         throw new Error('Too many failed attempts. Please try again later.');
       default:
         throw new Error(error.message || 'Login failed. Please try again.');
+    }
+  }
+}
+
+/**
+ * Sign in with Google
+ */
+export async function signInWithGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    return {
+      id: user.uid,
+      email: user.email,
+      name: user.displayName || user.email.split('@')[0],
+    };
+  } catch (error) {
+    console.error("Error signing in with Google:", error);
+    switch (error.code) {
+      case 'auth/popup-closed-by-user':
+        throw new Error('Sign-in popup was closed before completion.');
+      case 'auth/cancelled-popup-request':
+        throw new Error('Sign-in request was cancelled.');
+      default:
+        throw new Error(error.message || 'Google sign-in failed.');
     }
   }
 }

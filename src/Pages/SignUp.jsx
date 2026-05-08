@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { registerCustomer } from '../services/authService';
+import { registerCustomer, signInWithGoogle } from '../services/authService';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
+import { useAuth } from '../Context/AuthContext';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -11,14 +13,30 @@ const SignUp = () => {
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    setError(null);
+    try {
+      const userData = await signInWithGoogle();
+      login(userData);
+      navigate('/');
+    } catch (err) {
+      setError(err.message || "Google sign-in failed");
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -146,15 +164,35 @@ const SignUp = () => {
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isGoogleLoading}
               className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-orange-600'} 
+                ${(loading || isGoogleLoading) ? 'bg-gray-500 cursor-not-allowed' : 'bg-primary hover:bg-orange-600'} 
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200 font-[Poppins]`}
             >
               {loading ? 'Creating Account...' : 'Sign Up'}
             </button>
           </div>
         </form>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-black/60 text-gray-400 font-[Poppins]">Or continue with</span>
+          </div>
+        </div>
+
+        <div>
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading || isGoogleLoading}
+            className={`w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-700 rounded-md shadow-sm text-sm font-medium text-white bg-transparent hover:bg-white/5 transition-colors duration-200 font-[Poppins] ${(loading || isGoogleLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <FcGoogle className="text-xl" />
+            {isGoogleLoading ? 'Connecting...' : 'Google'}
+          </button>
+        </div>
 
         <div className="text-center mt-4">
           <p className="text-sm text-gray-400 font-[Poppins]">

@@ -28,17 +28,26 @@ export const CartProvider = ({ children }) => {
 
   // Load cart from Firestore when user logs in
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // Clear cart when logging out
+      setCartItems([]);
+      localStorage.removeItem('saga_cart');
+      return;
+    }
 
-    // If user exists and has a UID, listen to Firestore updates
-    if (user && user.uid) {
-      const cartRef = doc(db, 'carts', user.uid);
+    // If user exists and has an ID, listen to Firestore updates
+    if (user && user.id) {
+      const cartRef = doc(db, 'carts', user.id);
       const unsubscribe = onSnapshot(cartRef, (docSnap) => {
         if (docSnap.exists()) {
           const cloudItems = docSnap.data().items || [];
           setCartItems(cloudItems);
           // Also update localStorage so it's ready on next refresh
           localStorage.setItem('saga_cart', JSON.stringify(cloudItems));
+        } else {
+          // New user or no cloud cart — clear the inherited local cart
+          setCartItems([]);
+          localStorage.removeItem('saga_cart');
         }
       });
 
@@ -51,10 +60,10 @@ export const CartProvider = ({ children }) => {
     // Always save to localStorage for persistence on refresh
     localStorage.setItem('saga_cart', JSON.stringify(cartItems));
 
-    if (user && user.uid) {
+    if (user && user.id) {
       const syncToCloud = async () => {
         try {
-          const cartRef = doc(db, 'carts', user.uid);
+          const cartRef = doc(db, 'carts', user.id);
           await setDoc(cartRef, { 
             items: cartItems,
             updatedAt: new Date()
