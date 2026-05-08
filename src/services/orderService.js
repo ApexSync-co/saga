@@ -14,7 +14,8 @@ import {
   serverTimestamp,
   writeBatch,
   doc,
-  increment
+  increment,
+  onSnapshot
 } from 'firebase/firestore';
 
 const ORDERS_COLLECTION = 'orders';
@@ -57,7 +58,7 @@ export async function saveOrder(orderData) {
 }
 
 /**
- * Fetch orders for a specific user
+ * Fetch orders for a specific user (one-time)
  * @param {string} userId
  */
 export async function fetchUserOrders(userId) {
@@ -91,4 +92,62 @@ export async function fetchUserOrders(userId) {
         return [];
     }
   }
+}
+
+/**
+ * Subscribe to real-time order updates for a specific user.
+ * Returns an unsubscribe function to stop listening.
+ * @param {string} userId
+ * @param {function} onOrdersUpdate - callback receiving the updated orders array
+ * @param {function} onError - optional error callback
+ * @returns {function} unsubscribe function
+ */
+export function subscribeToUserOrders(userId, onOrdersUpdate, onError) {
+  // Try with ordering first
+  const q = query(
+    collection(db, ORDERS_COLLECTION),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  );
+
+  const unsubscribe = onSnapshot(q, 
+    (snapshot) => {
+      const orders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Recently',
+      }));
+      onOrdersUpdate(orders);
+    },
+    (error) => {
+      console.error("Real-time orders listener error:", error);
+      // Fallback: try without orderBy (index might not exist)
+      const fallbackQuery = query(
+        collection(db, ORDERS_COLLECTION),
+        where('userId', '==', userId)
+      );
+      const fallbackUnsub = onSnapshot(fallbackQuery,
+        (snapshot) => {
+          const orders = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Recently',
+          }));
+          onOrdersUpdate(orders);
+        },
+        (fallbackError) => {
+          console.error("Fallback listener also failed:", fallbackError);
+          if (onError) onError(fallbackError);
+        }
+      );
+      // Replace the unsubscribe reference (caller still has the original)
+      unsubscribe._fallback = fallbackUnsub;
+    }
+  );
+
+  // Return a wrapper that cleans up both listeners
+  return () => {
+    unsubscribe();
+    if (unsubscribe._fallback) unsubscribe._fallback();
+  };
 }

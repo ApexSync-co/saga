@@ -1,7 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
-import { fetchUserOrders } from '../../services/orderService';
+import { subscribeToUserOrders } from '../../services/orderService';
 import TrackingDisplay from '../../Components/TrackingDisplay';
+
+const DEMO_ORDERS = [
+    {
+        id: 'ORD-101-GOLD',
+        date: 'Oct 10, 2026',
+        total: '₹24,500',
+        status: 'In Transit',
+        awbNumber: 'V012345678',
+        paymentId: 'PAY-8899',
+        address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
+        items: [{ name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' }],
+        mockTracking: {
+            status: 'In Transit',
+            currentLocation: 'Mumbai Hub',
+            lastUpdate: 'Oct 14, 09:42 AM'
+        }
+    },
+    {
+        id: 'ORD-202-SILVER',
+        date: 'Oct 12, 2026',
+        total: '₹8,200',
+        status: 'Packed',
+        awbNumber: 'V098765432',
+        paymentId: 'PAY-1122',
+        address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
+        items: [{ name: 'Silver Necklace', quantity: 1, image: '/necklace.jpg' }],
+        mockTracking: {
+            status: 'Processing',
+            currentLocation: 'Delhi Sorting Center',
+            lastUpdate: 'Oct 13, 04:15 PM'
+        }
+    }
+];
 
 const MyOrders = () => {
     const { user } = useAuth();
@@ -11,58 +44,30 @@ const MyOrders = () => {
     const [isDemoTracking] = useState(false);
 
     useEffect(() => {
-        const loadOrders = async () => {
-            if (user) {
-                try {
-                    const userOrders = await fetchUserOrders(user.id);
-                    // Add dummy orders if no real orders exist for demonstration
-                    if (userOrders.length === 0) {
-                        setOrders([
-                            {
-                                id: 'ORD-101-GOLD',
-                                date: 'Oct 10, 2026',
-                                total: '₹24,500',
-                                status: 'In Transit',
-                                awbNumber: 'V012345678',
-                                paymentId: 'PAY-8899',
-                                address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
-                                items: [{ name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' }],
-                                mockTracking: {
-                                    status: 'In Transit',
-                                    currentLocation: 'Mumbai Hub',
-                                    lastUpdate: 'Oct 14, 09:42 AM'
-                                }
-                            },
-                            {
-                                id: 'ORD-202-SILVER',
-                                date: 'Oct 12, 2026',
-                                total: '₹8,200',
-                                status: 'Packed',
-                                awbNumber: 'V098765432',
-                                paymentId: 'PAY-1122',
-                                address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
-                                items: [{ name: 'Silver Necklace', quantity: 1, image: '/necklace.jpg' }],
-                                mockTracking: {
-                                    status: 'Processing',
-                                    currentLocation: 'Delhi Sorting Center',
-                                    lastUpdate: 'Oct 13, 04:15 PM'
-                                }
-                            }
-                        ]);
-                    } else {
-                        setOrders(userOrders);
-                    }
-                } catch (error) {
-                    console.error("Error loading orders:", error);
-                } finally {
-                    setLoading(false);
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
+        // Real-time listener — auto-updates when admin changes order status
+        const unsubscribe = subscribeToUserOrders(
+            user.id,
+            (liveOrders) => {
+                if (liveOrders.length === 0) {
+                    setOrders(DEMO_ORDERS);
+                } else {
+                    setOrders(liveOrders);
                 }
-            } else {
+                setLoading(false);
+            },
+            (error) => {
+                console.error("Error listening to orders:", error);
                 setLoading(false);
             }
-        };
+        );
 
-        loadOrders();
+        // Cleanup: stop listening when component unmounts or user changes
+        return () => unsubscribe();
     }, [user]);
 
     const handleTrackOrder = (order) => {
