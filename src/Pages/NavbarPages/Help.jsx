@@ -42,17 +42,7 @@ const Help = () => {
                                 Currently, we only ship within India. We are working on expanding our delivery network to international locations soon.
                             </p>
                         </details>
-                        <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
-                            <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
-                                Do you offer Cash on Delivery (COD)?
-                                <span className="transition group-open:rotate-180 group-open:text-primary">
-                                    <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                                </span>
-                            </summary>
-                            <p className="text-white/70 mt-3 group-open:animate-fadeIn text-sm leading-relaxed">
-                                Yes, we offer Cash on Delivery across most pin codes in India. You can select COD at checkout if your delivery address is eligible.
-                            </p>
-                        </details>
+
                     </div>
                 </div>
 
