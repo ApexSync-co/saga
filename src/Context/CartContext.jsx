@@ -1,33 +1,71 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { db } from '../services/firebase';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const CartContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    // Initial load from localStorage (works for both guests and logged-in users during hydration)
+    const savedCart = localStorage.getItem('saga_cart');
+    if (savedCart) {
+      try {
+        return JSON.parse(savedCart);
+      } catch (error) {
+        console.error("Failed to parse local cart data", error);
+      }
+    }
+    return [];
+  });
   const [authAlert, setAuthAlert] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Load cart from sessionStorage on mount
+  // Load cart from Firestore when user logs in
   useEffect(() => {
-    const savedCart = sessionStorage.getItem('saga_cart');
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error("Failed to parse cart data", error);
-      }
-    }
-  }, []);
+    if (!user) return;
 
-  // Save cart to sessionStorage whenever it changes
+    // If user exists and has a UID, listen to Firestore updates
+    if (user && user.uid) {
+      const cartRef = doc(db, 'carts', user.uid);
+      const unsubscribe = onSnapshot(cartRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const cloudItems = docSnap.data().items || [];
+          setCartItems(cloudItems);
+          // Also update localStorage so it's ready on next refresh
+          localStorage.setItem('saga_cart', JSON.stringify(cloudItems));
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
+
+  // Sync cart to Cloud (Firestore) and LocalStorage
   useEffect(() => {
-    sessionStorage.setItem('saga_cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    // Always save to localStorage for persistence on refresh
+    localStorage.setItem('saga_cart', JSON.stringify(cartItems));
+
+    if (user && user.uid) {
+      const syncToCloud = async () => {
+        try {
+          const cartRef = doc(db, 'carts', user.uid);
+          await setDoc(cartRef, { 
+            items: cartItems,
+            updatedAt: new Date()
+          }, { merge: true });
+        } catch (error) {
+          console.error("Error syncing cart to cloud:", error);
+        }
+      };
+      syncToCloud();
+    }
+  }, [cartItems, user]);
 
   const parsePrice = (price) => {
     if (typeof price === 'number') return price;
@@ -80,6 +118,10 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
+  const importCart = (items) => {
+    setCartItems(items);
+  };
+
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
         const price = parsePrice(item.price);
@@ -104,7 +146,8 @@ export const CartProvider = ({ children }) => {
       updateQuantity, 
       clearCart, 
       getCartTotal,
-      getCartCount
+      getCartCount,
+      importCart
     }}>
       {children}
       {authAlert && (

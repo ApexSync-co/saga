@@ -14,6 +14,8 @@ const ProductDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shared, setShared] = useState(false);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const { addToCart } = useCart();
   const { isAuthenticated, user } = useAuth();
@@ -54,6 +56,28 @@ const ProductDetail = () => {
     setAdding(true);
     addToCart(product);
     setTimeout(() => setAdding(false), 1500);
+  };
+
+  const handleShareProduct = async () => {
+    setSharing(true);
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Saga Jewelry - ${product.name}`,
+          text: `Check out this beautiful ${product.name} I found!`,
+          url: url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      }
+    } catch (error) {
+      console.error("Error sharing product:", error);
+    } finally {
+      setSharing(false);
+    }
   };
 
   const handleReviewSubmit = async (e) => {
@@ -254,34 +278,54 @@ const ProductDetail = () => {
               <p className="text-white border-t border-white/10 p-4 text-2xl font-bold font-Poppins drop-shadow-md mb-1">
                 {product.price}
               </p>
-              <button 
-                onClick={handleAddToCart}
-                disabled={adding}
-                className={`w-full group/btn relative overflow-hidden font-poppins py-6 rounded-2xl font-bold text-xl transition-all duration-700 flex items-center justify-center gap-3 shadow-2xl active:scale-95
-                  ${adding 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-white/5 text-white border border-white/10 hover:border-primary'
-                  }`}
-              >
-                {adding ? (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-7 h-7 animate-bounce">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={handleAddToCart}
+                  disabled={adding}
+                  className={`flex-1 group/btn relative overflow-hidden font-poppins py-6 rounded-2xl font-bold text-xl transition-all duration-700 flex items-center justify-center gap-3 shadow-2xl active:scale-95
+                    ${adding 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-white/5 text-white border border-white/10 hover:border-primary'
+                    }`}
+                >
+                  {adding ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-7 h-7 animate-bounce">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      Added to Bag
+                    </>
+                  ) : (
+                    <>
+                      <span className="relative z-10 flex items-center justify-center gap-3 transition-colors duration-500 group-hover/btn:text-black">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                          </svg>
+                          Add to Bag
+                      </span>
+                      <div className="absolute inset-0 bg-primary transform translate-y-full transition-transform duration-500 group-hover/btn:translate-y-0"></div>
+                    </>
+                  )}
+                </button>
+
+                <button 
+                  onClick={handleShareProduct}
+                  className="px-6 py-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/30 text-white flex items-center justify-center transition-all hover:bg-white/10"
+                  title="Share Product"
+                >
+                  {shared ? (
+                    <span className="text-xs text-green-400 font-bold uppercase tracking-widest">Link Copied!</span>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+                      <circle cx="18" cy="5" r="3"></circle>
+                      <circle cx="6" cy="12" r="3"></circle>
+                      <circle cx="18" cy="19" r="3"></circle>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                     </svg>
-                    Added to Bag
-                  </>
-                ) : (
-                  <>
-                    <span className="relative z-10 flex items-center justify-center gap-3 transition-colors duration-500 group-hover/btn:text-black">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                        </svg>
-                        Add to Bag
-                    </span>
-                    <div className="absolute inset-0 bg-primary transform translate-y-full transition-transform duration-500 group-hover/btn:translate-y-0"></div>
-                  </>
-                )}
-              </button>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

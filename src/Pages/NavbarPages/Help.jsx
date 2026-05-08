@@ -42,6 +42,7 @@ const Help = () => {
                                 Currently, we only ship within India. We are working on expanding our delivery network to international locations soon.
                             </p>
                         </details>
+
                     </div>
                 </div>
 

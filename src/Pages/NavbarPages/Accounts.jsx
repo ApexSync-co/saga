@@ -5,7 +5,6 @@ import { useAuth } from '../../Context/AuthContext';
 
 const Accounts = () => {
     const { user, updateUser } = useAuth();
-    const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',

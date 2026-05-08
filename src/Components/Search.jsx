@@ -5,7 +5,6 @@ import { searchProducts } from '../services/products';
 export default function Search({ isOpen, onClose }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
-    const [searching, setSearching] = useState(false);
     const navigate = useNavigate();
     const inputRef = useRef(null);
 
@@ -22,7 +21,6 @@ export default function Search({ isOpen, onClose }) {
                 return;
             }
 
-            setSearching(true);
             try {
                 // Fetch products from Shopify service
                 const products = await searchProducts(query);
@@ -40,8 +38,6 @@ export default function Search({ isOpen, onClose }) {
                 setResults(formattedResults);
             } catch (err) {
                 console.error("Search failed", err);
-            } finally {
-                setSearching(false);
             }
         };
 

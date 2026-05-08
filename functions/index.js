@@ -1,3 +1,4 @@
+/* eslint-disable */
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const axios = require('axios');
@@ -12,7 +13,7 @@ admin.initializeApp();
  * 1. Authenticate to get an access token.
  * 2. Use the token to fetch tracking data.
  */
-exports.trackOrder = functions.https.onCall(async (data, context) => {
+exports.trackOrder = functions.https.onCall(async (data) => {
   // 1. Check for the AWB number in the request
   const awbNumber = data.awbNumber;
   if (!awbNumber) {

@@ -153,35 +153,54 @@ export async function searchProducts(searchQuery) {
  * Uses a separate 'festive_edit' collection or returns defaults
  */
 export async function fetchFestiveEdit() {
-  // This is CMS-like content. For now, return static defaults.
-  // In the future, the admin can manage this through Firestore.
+  try {
+    const docRef = doc(db, 'site_config', 'festive_edit');
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+  } catch (error) {
+    console.error("Error fetching festive edit from Firestore:", error);
+  }
+
+  // Fallback to static defaults
   return {
     carousel: [
       { 
         src: '/stock1.jpeg', 
-        alt: 'Festive Look 1',
+        alt: '',
         title: 'Make Your Moments Beautiful',
         subtitle: 'Saga Exclusive'
       },
         { 
         src: '/stock2.jpeg', 
-        alt: 'Festive Look 2',
+        alt: '',
         title: 'Crafting Timeless Memories',
         subtitle: 'The Art of Jewelry'
       },
       { 
         src: '/stock3.jpeg', 
-        alt: 'Festive Look 3',
+        alt: '',
         title: 'Elegance for Every Occasion',
         subtitle: 'Curated Heritage'
       },
     ],
     items: [
-      { src: '/stock1.jpeg', alt: 'Festive Look 1' },
-      { src: '/stock2.jpeg', alt: 'Festive Look 2' },
-      { src: '/Rings.jpeg', alt: 'Festive Look 3' },
-      { src: '/stock3.jpeg', alt: 'Festive Look 4' },
+      { src: '/stock1.jpeg', alt: '' },
+      { src: '/stock2.jpeg', alt: '' },
+      { src: '/Rings.jpeg', alt: '' },
+      { src: '/stock3.jpeg', alt: '' },
     ],
-    banner: { src: '/stock4.jpg', alt: 'Traditional Coming Soon' },
+    banner: { src: '/stock4.jpg', alt: '' },
+    categories: [
+      { id: 'sets', name: 'Sets', image: '/Sets.jpg', subtitle: 'Complete heritage ensembles' },
+      { id: 'necklaces', name: 'Necklaces', image: '/Necklace.jpeg', subtitle: 'Majestic neckpieces' },
+      { id: 'earrings', name: 'Earrings', image: '/stock3.jpeg', subtitle: 'Radiance for your ears' },
+      { id: 'bangles', name: 'Bangles', image: '/Bangles.png', subtitle: 'Exquisite wrist adornments' },
+      { id: 'bracelets', name: 'Bracelets', image: '/Bracelets.jpeg', subtitle: 'Elegant modern classics' },
+      { id: 'pendants', name: 'Pendants', image: '/Pendant.jpeg', subtitle: 'Heartfelt brilliance' },
+      { id: 'rings', name: 'Rings', image: '/Rings.jpeg', subtitle: 'Symbols of eternity' },
+    ]
   };
 }
