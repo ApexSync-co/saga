@@ -1,0 +1,60 @@
+============================================
+  KAMYA — ECOM STORE COLOUR THEME
+  "Royal Heritage" Palette
+============================================
+
+LOGO INSPIRATION
+----------------
+- Warm cream/ivory background
+- Rich gold ornate frame
+- Deep navy & royal blue waves
+- Crimson/deep red lettering
+- Hints of burgundy and warm white
+
+
+COLOUR PALETTE
+--------------
+
+1. Primary Background   — Warm Ivory       #F5EDD6
+2. Deep Background      — Midnight Navy    #0D1B2A
+3. Primary Accent       — Antique Gold     #C9953A
+4. Secondary Accent     — Royal Blue       #1A3A6B
+5. CTA / Highlight      — Crimson Red      #8B1A1A
+6. Text (dark)          — Deep Espresso    #1C1008
+7. Text (light)         — Soft Cream       #FAF3E0
+8. Subtle Border        — Pale Gold        #E2C97E
+
+
+APPLICATION GUIDE
+-----------------
+
+Hero / Header       → Midnight Navy background, Gold typography & accents
+Product Cards       → Ivory/Cream background with Gold borders
+CTA Buttons         → Crimson Red with Gold hover state
+Footer              → Deep Navy with Cream text
+Sale / Badge Tags   → Gold on Crimson
+Section Dividers    → Pale Gold lines
+
+
+OVERALL VIBE
+------------
+Luxury Indian artisan / heritage brand.
+Premium, culturally rooted, warm, and elegant.
+Ideal for: sarees, jewellery, home décor, handcrafted goods.
+
+
+CSS VARIABLES (for developers)
+-------------------------------
+
+:root {
+  --color-bg-primary:     #F5EDD6;
+  --color-bg-dark:        #0D1B2A;
+  --color-gold:           #C9953A;
+  --color-royal-blue:     #1A3A6B;
+  --color-crimson:        #8B1A1A;
+  --color-text-dark:      #1C1008;
+  --color-text-light:     #FAF3E0;
+  --color-border-gold:    #E2C97E;
+}
+
+============================================

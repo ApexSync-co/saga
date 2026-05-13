@@ -1,0 +1,568 @@
+import React, { useState, useEffect } from 'react';
+import { useCart } from '../Context/CartContext';
+import { useAuth } from '../Context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { initiatePayment } from '../services/paymentService';
+import { saveOrder } from '../services/orderService';
+import { fetchUserAddresses, saveAddress } from '../services/addressService';
+import { fetchProductById } from '../services/products';
+import { shareCart, getSharedCart } from '../services/sharingService';
+import { useSearchParams } from 'react-router-dom';
+
+export default function Cart() {
+    const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart, importCart } = useCart();
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
+    const [shareUrl, setShareUrl] = useState(null);
+    const [sharedCartData, setSharedCartData] = useState(null);
+    const [isImporting, setIsImporting] = useState(false);
+    const [error, setError] = useState(null);
+    const [address, setAddress] = useState({
+        name: '',
+        addressLine1: '',
+        addressLine2: '',
+        landmark: '',
+        city: '',
+        state: '',
+        pincode: '',
+        phone: ''
+    });
+
+    const [savedAddresses, setSavedAddresses] = useState([]);
+    const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [isSavingAddress, setIsSavingAddress] = useState(false);
+
+    const total = getCartTotal();
+
+    useEffect(() => {
+        const sharedId = searchParams.get('sharedId');
+        if (sharedId) {
+            const loadSharedCart = async () => {
+                setIsImporting(true);
+                const items = await getSharedCart(sharedId);
+                if (items) {
+                    setSharedCartData(items);
+                }
+                setIsImporting(false);
+            };
+            loadSharedCart();
+        }
+    }, [searchParams]);
+
+    const handleImportSharedCart = () => {
+        if (sharedCartData) {
+            importCart(sharedCartData);
+            setSharedCartData(null);
+            setSearchParams({}); // Clear the URL
+        }
+    };
+
+    const handleShareCart = async () => {
+        if (cartItems.length === 0) return;
+        setIsSharing(true);
+        try {
+            const shareId = await shareCart(cartItems);
+            const url = `${window.location.origin}${window.location.pathname}?sharedId=${shareId}`;
+            setShareUrl(url);
+            
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'Kamya Jewelry - Shared Cart',
+                    text: 'Check out these luxury pieces I found at Kamya!',
+                    url: url
+                });
+            } else {
+                await navigator.clipboard.writeText(url);
+            }
+        } catch (err) {
+            console.error("Sharing failed:", err);
+        } finally {
+            setIsSharing(false);
+        }
+    };
+    useEffect(() => {
+        const loadDefaultAddress = async () => {
+            if (user?.id) {
+                try {
+                    const addresses = await fetchUserAddresses(user.id);
+                    if (addresses && addresses.length > 0) {
+                        setSavedAddresses(addresses);
+                        handleSelectSavedAddress(addresses[0]);
+                    } else {
+                        setShowNewAddressForm(true);
+                    }
+                } catch (err) {
+                    console.error("Failed to load default address:", err);
+                }
+            } else {
+                setShowNewAddressForm(true);
+            }
+        };
+
+        loadDefaultAddress();
+    }, [user]);
+
+    const handleSelectSavedAddress = (addr) => {
+        setSelectedAddressId(addr.id);
+        setAddress({
+            name: addr.name || '',
+            addressLine1: addr.addressLine1 || '',
+            addressLine2: addr.addressLine2 || '',
+            landmark: addr.landmark || '',
+            city: addr.city || '',
+            state: addr.state || '',
+            pincode: addr.pincode || '',
+            phone: addr.phone || ''
+        });
+        setShowNewAddressForm(false);
+    };
+    const handleToggleNewAddress = () => {
+        setShowNewAddressForm(true);
+        setSelectedAddressId(null);
+        setAddress({ 
+            name: user?.name || '',
+            addressLine1: '', 
+            addressLine2: '',
+            landmark: '',
+            city: '', 
+            state: '',
+            pincode: '', 
+            phone: '' 
+        });
+    };
+
+    const handleAddressChange = (e) => {
+        const { name, value } = e.target;
+        setAddress(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSaveNewAddress = async () => {
+        if (!user) {
+            setError('Please sign in to save an address.');
+            return;
+        }
+        if (!address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
+            setError('Please fill in all required address fields to save.');
+            return;
+        }
+        
+        setIsSavingAddress(true);
+        setError(null);
+        try {
+            const saved = await saveAddress(user.id, {
+                type: 'Home',
+                name: address.name,
+                addressLine1: address.addressLine1,
+                addressLine2: address.addressLine2,
+                landmark: address.landmark,
+                city: address.city,
+                state: address.state,
+                pincode: address.pincode,
+                phone: address.phone
+            });
+            const updatedAddresses = [...savedAddresses, saved];
+            setSavedAddresses(updatedAddresses);
+            handleSelectSavedAddress(saved);
+        } catch (err) {
+            console.error("Failed to save address:", err);
+            setError("Failed to save the address. Please try again.");
+        } finally {
+            setIsSavingAddress(false);
+        }
+    };
+
+    const handleCheckout = async () => {
+        if (!user) {
+            navigate('/signin');
+            return;
+        }
+
+        // Basic validation
+        const missingFields = [];
+        if (!address.name) missingFields.push('Full Name');
+        if (!address.addressLine1) missingFields.push('Address Line 1');
+        if (!address.city) missingFields.push('City');
+        if (!address.state) missingFields.push('State');
+        if (!address.pincode) missingFields.push('Pincode');
+        if (!address.phone) missingFields.push('Phone');
+
+        if (missingFields.length > 0) {
+            setError(`Please complete your address. Missing: ${missingFields.join(', ')}`);
+            return;
+        }
+
+        setIsProcessing(true);
+        setError(null);
+
+        try {
+            // Pre-checkout stock validation
+            for (const item of cartItems) {
+                if (item.id) {
+                    const latestProductData = await fetchProductById(item.id);
+                    if (!latestProductData) {
+                        throw new Error(`Product "${item.name}" is no longer available.`);
+                    }
+                    if (latestProductData.stock < item.quantity) {
+                        throw new Error(`Sorry, we only have ${latestProductData.stock} left in stock for "${item.name}". Please reduce the quantity.`);
+                    }
+                }
+            }
+
+            const result = await initiatePayment({
+                amount: total,
+                customerName: user.name || 'Kamya Customer',
+                customerEmail: user.email,
+                customerPhone: address.phone
+            });
+
+            if (result.success) {
+                // SAVE THE ORDER TO FIRESTORE
+                const savedOrder = await saveOrder({
+                    userId: user.id,
+                    customerName: address.name || user.name || 'Kamya Customer',
+                    customerEmail: user.email || '',
+                    items: cartItems,
+                    total: `₹${total.toLocaleString('en-IN')}`,
+                    rawTotal: total,
+                    address: address,
+                    paymentId: result.paymentId,
+                    razorpayOrderId: result.orderId,
+                });
+
+                clearCart();
+                navigate('/order-success', { 
+                    state: { 
+                        orderId: savedOrder.id, 
+                        paymentId: result.paymentId 
+                    } 
+                });
+            }
+        } catch (err) {
+            console.error("Checkout failed:", err);
+            setError(err.message || 'Payment initiation failed. Please try again.');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const sharedId = searchParams.get('sharedId');
+
+    if (cartItems.length === 0 && !sharedCartData && !sharedId) {
+        return (
+            <div className="min-h-screen bg-bg-primary text-text-dark flex flex-col items-center justify-center pt-20">
+                <h2 className="text-4xl font-Great_Vibes mb-4">Your Cart is Empty</h2>
+                <p className="text-text-dark/60 mb-8">Looks like you haven't added anything yet.</p>
+                <Link to="/" className="bg-crimson text-white px-8 py-3 hover:bg-gold transition-all duration-300">
+                    CONTINUE SHOPPING
+                </Link>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-transparent text-text-dark pt-28 pb-10 px-4">
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-5xl font-Great_Vibes text-center mb-12">Shopping Cart</h1>
+
+                {isImporting && (
+                    <div className="flex justify-center py-12">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                )}
+
+                {sharedCartData && (
+                    <div className="bg-primary/10 border border-primary/30 p-6 rounded-sm mb-12 flex flex-col md:flex-row items-center justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div>
+                            <h3 className="text-xl font-medium text-text-dark mb-1">Shared Cart Detected</h3>
+                            <p className="text-text-dark/60 text-sm">Someone shared {sharedCartData.length} items with you. Would you like to view them?</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={() => setSharedCartData(null)}
+                                className="px-6 py-2 border border-white/20 text-white text-sm hover:bg-white/5 transition-colors"
+                            >
+                                IGNORE
+                            </button>
+                            <button 
+                                onClick={handleImportSharedCart}
+                                className="px-6 py-2 bg-primary text-white text-sm font-medium hover:bg-primary/80 transition-colors"
+                            >
+                                LOAD SHARED CART
+                            </button>
+                        </div>
+                    </div>
+                )}
+                
+                <div className="flex flex-col lg:flex-row gap-12">
+                    {/* Cart Items List */}
+                    <div className="lg:w-2/3">
+                        <div className="hidden md:grid grid-cols-4 gap-4 border-b border-zinc-800 pb-4 mb-4 text-zinc-400 text-sm uppercase tracking-wider">
+                            <div className="col-span-2">Product</div>
+                            <div className="text-center">Quantity</div>
+                            <div className="text-right">Total</div>
+                        </div>
+
+                        <div className="flex flex-col gap-6 mb-12">
+                            {cartItems.map((item) => (
+                                <div key={`${item.id}-${item.name}`} className="flex flex-col md:grid md:grid-cols-4 gap-4 items-center border-b border-border-gold/20 pb-6">
+                                    <div className="col-span-2 flex items-center md:flex-row flex-col text-center md:text-left gap-4 w-full">
+                                        <div className="w-24 h-24 overflow-hidden bg-bg-card flex-shrink-0">
+                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-lg">{item.name}</h3>
+                                            <p className="text-text-dark/60 text-sm mt-1">{item.price}</p>
+                                            <button 
+                                                onClick={() => removeFromCart(item.id, item.name)}
+                                                className="text-xs text-red-400/50 mt-2 hover:text-red-500 border-b border-red-400 pb-0.5"
+                                            >
+                                                REMOVE
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-center gap-3">
+                                        <button 
+                                            onClick={() => updateQuantity(item.id, item.name, item.quantity - 1)}
+                                            className="w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center hover:bg-zinc-800"
+                                        >
+                                            -
+                                        </button>
+                                        <span className="w-8 text-center">{item.quantity}</span>
+                                        <button 
+                                            onClick={() => updateQuantity(item.id, item.name, item.quantity + 1)}
+                                            className="w-8 h-8 rounded-full border border-zinc-700 flex items-center justify-center hover:bg-zinc-800"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+
+                                    <div className="text-right font-medium text-lg w-full md:w-auto text-center md:text-right">
+                                        ₹{(parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity).toLocaleString('en-IN')}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Delivery Details */}
+                        <div className="bg-bg-card/40 p-8 rounded-sm border border-border-gold/20">
+                            <h2 className="text-2xl font-Great_Vibes mb-6 text-text-dark">Delivery Details</h2>
+
+                            {savedAddresses.length > 0 && (
+                                <div className="mb-6 space-y-4">
+                                    <label className="text-xs text-zinc-400 uppercase tracking-widest">Select a saved address</label>
+                                    <select
+                                        value={selectedAddressId || ''}
+                                        onChange={(e) => {
+                                            if (e.target.value === 'new') {
+                                                handleToggleNewAddress();
+                                            } else {
+                                                const addr = savedAddresses.find(a => a.id === e.target.value);
+                                                if (addr) handleSelectSavedAddress(addr);
+                                            }
+                                        }}
+                                        className="w-full bg-bg-card border border-border-gold/30 text-text-dark p-3 text-sm outline-none focus:border-primary transition-colors cursor-pointer"
+                                    >
+                                        {savedAddresses.map((addr) => (
+                                            <option key={addr.id} value={addr.id}>
+                                                {addr.name} — {addr.addressLine1}, {addr.city} {addr.pincode} | Ph: {addr.phone}
+                                            </option>
+                                        ))}
+                                        <option value="new">+ Deliver to a different address</option>
+                                    </select>
+                                </div>
+                            )}
+                            {showNewAddressForm && (
+                                <div className={`${savedAddresses.length > 0 ? "mt-4 pt-6 border-t border-zinc-800" : ""}`}>
+                                    <div className="flex justify-between items-end mb-6">
+                                        <h3 className="text-lg font-medium text-white">Add New Address</h3>
+                                        {savedAddresses.length > 0 && (
+                                            <button 
+                                                onClick={() => handleSelectSavedAddress(savedAddresses[0])}
+                                                className="text-xs text-zinc-400 hover:text-white underline underline-offset-4"
+                                            >
+                                                Cancel
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2 md:col-span-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Full Name</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="name"
+                                                 value={address.name}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Rahul Sharma" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                        <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 1</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="addressLine1"
+                                                 value={address.addressLine1}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="House No, Building, Street" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Address Line 2 (Optional)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="addressLine2"
+                                                 value={address.addressLine2}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="Area, Colony, Sector" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Landmark (Optional)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="landmark"
+                                                 value={address.landmark}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="Near Apollo Hospital" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">City</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="city"
+                                                 value={address.city}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Mumbai" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">State</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="state"
+                                                 value={address.state}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. Maharashtra" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode (6-digit)</label>
+                                             <input 
+                                                 type="text" 
+                                                 name="pincode"
+                                                 value={address.pincode}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="e.g. 690503" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                         <div className="space-y-2 md:col-span-2">
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">Phone Number</label>
+                                             <input 
+                                                 type="tel" 
+                                                 name="phone"
+                                                 value={address.phone}
+                                                 onChange={handleAddressChange}
+                                                 placeholder="10-digit mobile number" 
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
+                                             />
+                                         </div>
+                                    </div>
+                                    <div className="md:col-span-2 pt-2 flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={handleSaveNewAddress}
+                                            disabled={isSavingAddress || !address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone}
+                                            className="bg-white text-black px-6 py-2 text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isSavingAddress ? 'Saving...' : 'Save & Select Address'}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Order Summary */}
+                    <div className="lg:w-1/3">
+                        <div className="bg-bg-card/40 p-8 rounded-sm sticky top-28 border border-border-gold/20">
+                            <h2 className="text-2xl font-Great_Vibes mb-6 text-text-dark">Order Summary</h2>
+                            
+                            <div className="space-y-4 mb-6 text-sm">
+                                <div className="flex justify-between text-text-dark/60">
+                                    <span>Subtotal</span>
+                                    <span className="text-text-dark">₹{total.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div className="flex justify-between text-text-dark/60">
+                                    <span>Shipping</span>
+                                    <span className="text-green-600">Free</span>
+                                </div>
+                            </div>
+                            
+                            <div className="border-t border-zinc-800 pt-4 mb-8">
+                                <div className="flex justify-between items-center text-lg">
+                                    <span>Total</span>
+                                    <span className="font-bold">₹{total.toLocaleString('en-IN')}</span>
+                                </div>
+                                <p className="text-xs text-zinc-500 mt-2">Including all taxes</p>
+                            </div>
+
+                            {error && (
+                                <div className="bg-red-900/40 border border-red-500/50 text-red-200 text-xs p-3 rounded mb-4">
+                                    {error}
+                                </div>
+                            )}
+
+                            <button 
+                                onClick={handleCheckout}
+                                disabled={isProcessing}
+                                className={`w-full bg-crimson text-white py-4 border border-border-gold/30 font-medium hover:bg-gold transition-colors uppercase tracking-widest text-sm ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {isProcessing ? 'Processing Payment...' : 'Proceed to Checkout'}
+                            </button>
+                            
+                            <button 
+                                onClick={clearCart}
+                                disabled={isProcessing}
+                                className="w-full mt-4 text-zinc-500 hover:text-white text-xs transition-colors"
+                            >
+                                Clear Cart
+                            </button>
+
+                            <div className="mt-8 pt-8 border-t border-zinc-800">
+                                <button
+                                    onClick={handleShareCart}
+                                    disabled={isSharing}
+                                    className="w-full flex items-center justify-center gap-2 text-zinc-400 hover:text-primary transition-colors text-sm py-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                    </svg>
+                                    {isSharing ? 'Generating Link...' : 'Share this Cart'}
+                                </button>
+                                {shareUrl && !navigator.share && (
+                                    <p className="text-[10px] text-green-500 text-center mt-2 animate-pulse">Link copied to clipboard!</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

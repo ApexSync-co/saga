@@ -1,0 +1,81 @@
+============================================
+  KAMYA / SAGA — LIGHT THEME REWORK
+  Jewellery Ecom Store
+============================================
+
+CURRENT ISSUE
+-------------
+The dark navy background feels heavy and can
+overshadow the jewellery products. Switching
+to a light/ivory base will let the gold, gems,
+and product photography shine naturally.
+
+
+COLOUR CHANGES — DARK TO LIGHT
+--------------------------------
+
+Page Background     : Navy #0D1B2A   →  Warm Ivory    #F5EDD6
+Navbar / Header     : Dark Navy      →  Ivory + Gold bottom border
+Category Labels     : White          →  Deep Espresso #1C1008
+Body Text           : Light grey     →  Deep Espresso #1C1008
+Card Backgrounds    : Dark overlay   →  Soft Cream    #FAF3E0
+Section Dividers    : None           →  Pale Gold     #E2C97E
+
+
+ELEMENTS TO KEEP UNCHANGED
+----------------------------
+- "Heritage Edit" gold script text   → stays gold (looks great on ivory)
+- Category circle gold ring borders  → no change needed
+- SAGA logo                          → use Crimson #8B1A1A or Gold on ivory
+- Hero/product images                → same images work on light background
+- CTA Buttons                        → Crimson Red #8B1A1A with gold border
+
+
+SUGGESTED: KEEP THESE DARK
+----------------------------
+- Footer          → Keep Midnight Navy #0D1B2A with Cream text
+- Top Navbar      → Option to keep dark for contrast and grounding
+  (prevents the page from looking too plain or washed out)
+
+
+FULL LIGHT THEME PALETTE
+--------------------------
+
+Primary Background  — Warm Ivory      #F5EDD6
+Card Background     — Soft Cream      #FAF3E0
+Primary Accent      — Antique Gold    #C9953A
+Secondary Accent    — Royal Blue      #1A3A6B
+CTA / Buttons       — Crimson Red     #8B1A1A
+Main Text           — Deep Espresso   #1C1008
+Subtext / Labels    — Warm Brown      #5C3D1E
+Borders / Dividers  — Pale Gold       #E2C97E
+Footer Background   — Midnight Navy   #0D1B2A
+Footer Text         — Soft Cream      #FAF3E0
+
+
+WHY LIGHT WORKS BETTER FOR JEWELLERY
+--------------------------------------
+1. Gold and gemstone colours pop more on ivory/cream
+2. Feels airy and premium (reference: Tanishq, Malabar Gold)
+3. Product photography looks richer on light backgrounds
+4. Easier on the eyes for long browsing sessions
+5. Bright products don't get lost in a dark backdrop
+
+
+CSS VARIABLES (Light Theme)
+-----------------------------
+
+:root {
+  --color-bg-primary:     #F5EDD6;
+  --color-bg-card:        #FAF3E0;
+  --color-gold:           #C9953A;
+  --color-royal-blue:     #1A3A6B;
+  --color-crimson:        #8B1A1A;
+  --color-text-dark:      #1C1008;
+  --color-text-sub:       #5C3D1E;
+  --color-border-gold:    #E2C97E;
+  --color-footer-bg:      #0D1B2A;
+  --color-footer-text:    #FAF3E0;
+}
+
+============================================
