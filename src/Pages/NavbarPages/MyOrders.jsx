@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
 import { subscribeToUserOrders } from '../../services/orderService';
+import { trackOrder } from '../../services/trackingService';
 import TrackingDisplay from '../../Components/TrackingDisplay';
 
 const DEMO_ORDERS = [
@@ -41,7 +42,8 @@ const MyOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [trackingData, setTrackingData] = useState(null);
-    const [isDemoTracking] = useState(false);
+    const [trackingLoading, setTrackingLoading] = useState(false);
+    const [isDemoTracking, setIsDemoTracking] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -70,11 +72,40 @@ const MyOrders = () => {
         return () => unsubscribe();
     }, [user]);
 
-    const handleTrackOrder = (order) => {
-        const message = `Hi, I would like to track my order.\nOrder ID: ${order.id}`;
-        const whatsappNumber = "919847294800";
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
+    const handleTrackOrder = async (order) => {
+        const awb = order.trackingId || order.awb || order.awbNumber;
+        
+        if (!awb) {
+            // Fallback to WhatsApp if no AWB is available
+            const message = `Hi, I would like to track my order.\nOrder ID: ${order.id}`;
+            const whatsappNumber = "919847294800";
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            return;
+        }
+
+        setTrackingLoading(true);
+        setIsDemoTracking(false);
+        try {
+            const data = await trackOrder(awb);
+            setTrackingData({
+                ...data,
+                id: order.id,
+                items: order.items
+            });
+        } catch (error) {
+            console.error("Tracking error:", error);
+            // Fallback to demo or error state if needed
+            setTrackingData({
+                id: order.id,
+                status: 'AWB Not Found',
+                location: 'Processing',
+                history: [],
+                items: order.items
+            });
+        } finally {
+            setTrackingLoading(false);
+        }
     };
 
     if (loading) {
@@ -168,9 +199,12 @@ const MyOrders = () => {
                                         <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
                                             <button 
                                                 onClick={() => handleTrackOrder(order)}
-                                                className="flex-1 group/btn relative overflow-hidden bg-white text-black py-4 px-6 text-[10px] uppercase font-bold tracking-[0.4em] transition-all duration-500 rounded-sm"
+                                                disabled={trackingLoading}
+                                                className="flex-1 group/btn relative overflow-hidden bg-white text-black py-4 px-6 text-[10px] uppercase font-bold tracking-[0.4em] transition-all duration-500 rounded-sm disabled:opacity-50"
                                             >
-                                                <span className="relative z-10">Track Shipment</span>
+                                                <span className="relative z-10">
+                                                    {trackingLoading ? 'Locating...' : 'Track Shipment'}
+                                                </span>
                                                 <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500"></div>
                                             </button>
 

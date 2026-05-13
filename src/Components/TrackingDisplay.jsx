@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
 const steps = [
-    { label: 'Ordered', status: 'Payment Received' },
-    { label: 'Acquired', status: 'Shipment Received' },
-    { label: 'Transit', status: 'Under Transit' },
-    { label: 'Arrival', status: 'Out for Delivery' },
-    { label: 'Delivery', status: 'Delivered' }
+    { label: 'Booked', status: 'BOOKED' },
+    { label: 'Transit', status: 'IN TRANSIT' },
+    { label: 'Arrival', status: 'OUT FOR DELIVERY' },
+    { label: 'Delivery', status: 'DELIVERED' }
 ];
+
+// Helper to normalize DTDC status to our steps
+const normalizeStatus = (status) => {
+    if (!status) return 'BOOKED';
+    const s = status.toUpperCase();
+    if (s.includes('DELIVERED')) return 'DELIVERED';
+    if (s.includes('OUT FOR DELIVERY')) return 'OUT FOR DELIVERY';
+    if (s.includes('TRANSIT')) return 'IN TRANSIT';
+    if (s.includes('BOOKED')) return 'BOOKED';
+    return s;
+};
 
 const TrackingDisplay = ({ trackingData, onClose }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -16,21 +26,21 @@ const TrackingDisplay = ({ trackingData, onClose }) => {
     useEffect(() => {
         const raf = window.requestAnimationFrame(() => {
             setIsVisible(true);
-            const currentStatus = trackingData?.status || 'Shipment Received';
+            const currentStatus = normalizeStatus(trackingData?.status);
             const statusIndex = steps.findIndex(s => s.status === currentStatus);
-            const safeIndex = statusIndex === -1 ? 1 : statusIndex;
+            const safeIndex = statusIndex === -1 ? 0 : statusIndex;
             setTimeout(() => {
                 setProgress((safeIndex / (steps.length - 1)) * 100);
             }, 300);
         });
         return () => window.cancelAnimationFrame(raf);
     }, [trackingData]);
-
+ 
     if (!trackingData) return null;
-
-    const currentStatusLabel = trackingData.status || 'Shipment Received';
-    const statusIdx = steps.findIndex(s => s.status === currentStatusLabel);
-    const currentIndex = statusIdx === -1 ? 1 : statusIdx;
+ 
+    const currentStatusLabel = trackingData.status || 'BOOKED';
+    const statusIdx = steps.findIndex(s => s.status === normalizeStatus(currentStatusLabel));
+    const currentIndex = statusIdx === -1 ? 0 : statusIdx;
 
     return (
         <div className={'fixed inset-0 z-100 flex items-center justify-center p-4 transition-all duration-700 ' + (isVisible ? 'bg-black/95 backdrop-blur-sm' : 'bg-transparent')}>

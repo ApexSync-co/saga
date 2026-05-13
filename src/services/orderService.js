@@ -30,12 +30,7 @@ export async function saveOrder(orderData) {
     
     // 1. Create a reference for the new order document
     const orderRef = doc(collection(db, ORDERS_COLLECTION));
-    batch.set(orderRef, {
-      ...orderData,
-      status: 'Processing',
-      createdAt: serverTimestamp(),
-    });
-
+    
     // 2. Queue up stock reductions for each product in the order
     const items = orderData.items || [];
     for (const item of items) {
@@ -47,8 +42,57 @@ export async function saveOrder(orderData) {
       }
     }
 
-    // 3. Commit the batch atomically (both order creation & stock reduction happen together)
+    // 3. Commit the batch atomically (order creation & stock reduction)
+    // Initially save without AWB
+    batch.set(orderRef, {
+      ...orderData,
+      status: 'Processing',
+      createdAt: serverTimestamp(),
+    });
+
     await batch.commit();
+
+    // 4. Trigger DTDC Consignment Creation (Order Upload API) via Backend
+    try {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${BACKEND_URL}/create-consignment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...orderData,
+          orderId: orderData.orderId || orderRef.id,
+          // Optional: passing defaults that can be overridden by orderData
+          service_type_id: 'B2C PRIORITY',
+          load_type: 'NON-DOCUMENT',
+          length: '10',
+          width: '10',
+          height: '5',
+          weight: '0.5'
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.status === 'success' && result.awb) {
+          // Update the order with the AWB number
+          const { updateDoc } = await import('firebase/firestore');
+          await updateDoc(orderRef, {
+            awb: result.awb,
+            shippingDetails: result.details,
+            status: 'Shipped' // Or 'Ready for Pickup'
+          });
+          console.log("DTDC Consignment created successfully:", result.awb);
+          return { id: orderRef.id, ...orderData, awb: result.awb };
+        }
+      } else {
+        console.warn("Shipsy consignment creation failed, but order was saved to Firestore.");
+      }
+    } catch (shippingError) {
+      console.error("Error creating DTDC consignment:", shippingError);
+      // We don't throw here because the order is already saved to Firestore
+    }
 
     return { id: orderRef.id, ...orderData };
   } catch (error) {
