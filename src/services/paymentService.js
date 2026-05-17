@@ -8,15 +8,21 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 /**
  * Initialize a Razorpay Payment
- * @param {Object} options - { amount, customerName, customerEmail, customerPhone }
+ * @param {Object} options - { amount, customerName, customerEmail, customerPhone, userId, items, address }
  * @returns {Promise} - Resolves with the payment confirmation or rejects with error
  */
-export const initiatePayment = async ({ amount, customerName, customerEmail, customerPhone }) => {
+export const initiatePayment = async ({ amount, customerName, customerEmail, customerPhone, userId, items, address }) => {
   // 1. Create Order on our Flask Backend
   const orderResponse = await fetch(`${BACKEND_URL}/create-order`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount, currency: 'INR' }),
+    body: JSON.stringify({ 
+        amount, 
+        currency: 'INR',
+        userId,
+        items,
+        address
+    }),
   });
 
   const orderData = await orderResponse.json();

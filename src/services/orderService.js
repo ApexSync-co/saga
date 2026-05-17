@@ -18,120 +18,82 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 const ORDERS_COLLECTION = 'orders';
 
 /**
- * Save a new order to Firestore and simultaneously reduce product stock
+ * Save a new order to Firestore via Backend API (handles stock atomically)
  * @param {Object} orderData - { userId, items, total, address, paymentId, orderId }
  */
 export async function saveOrder(orderData) {
   try {
-    const batch = writeBatch(db);
-    
-    // 1. Create a reference for the new order document
-    const orderRef = doc(collection(db, ORDERS_COLLECTION));
-    
-    // 2. Queue up stock reductions for each product in the order
-    const items = orderData.items || [];
-    for (const item of items) {
-      if (item.id) {
-        const productRef = doc(db, 'products', item.id);
-        batch.update(productRef, {
-          stock: increment(-(item.quantity || 1))
-        });
-      }
-    }
-
-    // 3. Commit the batch atomically (order creation & stock reduction)
-    // Initially save without AWB
-    batch.set(orderRef, {
-      ...orderData,
-      status: 'Processing',
-      createdAt: serverTimestamp(),
+    const response = await fetch(`${BACKEND_URL}/place-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
     });
 
-    await batch.commit();
+    const result = await response.json();
 
-    // 4. Trigger DTDC Consignment Creation (Order Upload API) via Backend
-    try {
-      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-      const response = await fetch(`${BACKEND_URL}/create-consignment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...orderData,
-          orderId: orderData.orderId || orderRef.id,
-          // Optional: passing defaults that can be overridden by orderData
-          service_type_id: 'B2C PRIORITY',
-          load_type: 'NON-DOCUMENT',
-          length: '10',
-          width: '10',
-          height: '5',
-          weight: '0.5'
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.status === 'success' && result.awb) {
-          // Update the order with the AWB number
-          const { updateDoc } = await import('firebase/firestore');
-          await updateDoc(orderRef, {
-            awb: result.awb,
-            shippingDetails: result.details,
-            status: 'Shipped' // Or 'Ready for Pickup'
-          });
-          console.log("DTDC Consignment created successfully:", result.awb);
-          return { id: orderRef.id, ...orderData, awb: result.awb };
-        }
-      } else {
-        console.warn("Shipsy consignment creation failed, but order was saved to Firestore.");
-      }
-    } catch (shippingError) {
-      console.error("Error creating DTDC consignment:", shippingError);
-      // We don't throw here because the order is already saved to Firestore
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to place order');
     }
 
-    return { id: orderRef.id, ...orderData };
+    // Trigger DTDC Consignment if order was successfully placed
+    // We keep this separate for now to allow order success even if shipping API is down
+    if (result.orderId) {
+        try {
+            await fetch(`${BACKEND_URL}/create-consignment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...orderData,
+                    orderId: result.orderId
+                })
+            });
+        } catch (e) {
+            console.warn("Auto-consignment trigger failed, but order is saved:", e);
+        }
+    }
+
+    return { id: result.orderId, ...orderData };
   } catch (error) {
-    console.error("Error saving order and reducing stock:", error);
+    console.error("Error in saveOrder service:", error);
     throw error;
   }
 }
 
 /**
- * Fetch orders for a specific user (one-time)
+ * Fetch orders for a specific user via Backend API
  * @param {string} userId
  */
 export async function fetchUserOrders(userId) {
   try {
-    const q = query(
-      collection(db, ORDERS_COLLECTION),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Recently',
+    const response = await fetch(`${BACKEND_URL}/user-orders/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch orders');
+    
+    const orders = await response.json();
+    return orders.map(order => ({
+      ...order,
+      date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Recently',
     }));
   } catch (error) {
     console.error("Error fetching user orders:", error);
-    // If it's an index error, fallback to un-ordered fetch
+    // Fallback to direct Firestore read if backend is down (Read-only is safer)
     try {
         const q = query(
-            collection(db, ORDERS_COLLECTION),
-            where('userId', '==', userId)
-          );
-          const snapshot = await getDocs(q);
-          return snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Recently',
-          }));
+          collection(db, ORDERS_COLLECTION),
+          where('userId', '==', userId),
+          orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Recently',
+        }));
     } catch {
         return [];
     }

@@ -217,27 +217,18 @@ export default function Cart() {
                 amount: total,
                 customerName: address.name || user.name || 'Saga Customer',
                 customerEmail: user.email,
-                customerPhone: address.phone
+                customerPhone: address.phone,
+                userId: user.id,
+                items: cartItems,
+                address: address
             });
 
             if (result.success) {
-                // SAVE THE ORDER TO FIRESTORE
-                const savedOrder = await saveOrder({
-                    userId: user.id,
-                    customerName: address.name || user.name || 'Saga Customer',
-                    customerEmail: user.email || '',
-                    items: cartItems,
-                    total: `₹${total.toLocaleString('en-IN')}`,
-                    rawTotal: total,
-                    address: address,
-                    paymentId: result.paymentId,
-                    razorpayOrderId: result.orderId,
-                });
-
+                // The order is already finalized by the backend during /verify-payment
                 clearCart();
                 navigate('/order-success', { 
                     state: { 
-                        orderId: savedOrder.id, 
+                        orderId: result.orderId, 
                         paymentId: result.paymentId 
                     } 
                 });
