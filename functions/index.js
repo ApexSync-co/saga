@@ -4,6 +4,51 @@ const axios = require('axios');
 
 admin.initializeApp();
 
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
+const razorpay = new Razorpay({
+  key_id: 'rzp_test_SoiV3ZiVmJblos',
+  key_secret: 'o9YIH7QyLDrh5n0bmFS0lRAj',
+});
+
+exports.createRazorpayOrder = functions.https.onCall(async (data, context) => {
+  const amount = data.amount;
+  if (!amount) {
+    throw new functions.https.HttpsError('invalid-argument', 'Amount is required');
+  }
+
+  try {
+    const options = {
+      amount: Math.round(amount * 100), // amount in paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`
+    };
+    
+    const order = await razorpay.orders.create(options);
+    return order;
+  } catch (error) {
+    console.error('Error creating Razorpay order:', error);
+    throw new functions.https.HttpsError('internal', 'Unable to create order');
+  }
+});
+
+exports.verifyRazorpayPayment = functions.https.onCall(async (data, context) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = data;
+
+  const text = razorpay_order_id + "|" + razorpay_payment_id;
+  const generated_signature = crypto
+    .createHmac("sha256", 'o9YIH7QyLDrh5n0bmFS0lRAj')
+    .update(text.toString())
+    .digest("hex");
+
+  if (generated_signature === razorpay_signature) {
+    return { status: "success" };
+  } else {
+    throw new functions.https.HttpsError('invalid-argument', 'Signature verification failed');
+  }
+});
+
 /**
  * Cloud Function to track DTDC orders.
  * This function should be deployed to Firebase Functions.

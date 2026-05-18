@@ -1,10 +1,10 @@
 /**
  * Razorpay Payment Service
  * 
- * Logic to communicate with the Flask backend and the Razorpay SDK.
+ * Logic to communicate with the local backend and the Razorpay SDK.
  */
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'; // Use env var for production
+const BACKEND_URL = 'http://localhost:5000';
 
 /**
  * Initialize a Razorpay Payment
@@ -14,7 +14,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 export const initiatePayment = async ({ amount, customerName, customerEmail, customerPhone }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // 1. Create Order on our Flask Backend
+      // 1. Create Order on our local Backend
       const orderResponse = await fetch(`${BACKEND_URL}/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -29,7 +29,7 @@ export const initiatePayment = async ({ amount, customerName, customerEmail, cus
 
       // 2. Configure Razorpay Options
       const rzpOptions = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'YOUR_KEY_ID', // Better to get from backend or env
+        key: 'rzp_test_SoiV3ZiVmJblos', // Test key
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Saga",
@@ -37,7 +37,7 @@ export const initiatePayment = async ({ amount, customerName, customerEmail, cus
         image: "/SAGA LOGO.PNG",
         order_id: orderData.id,
         handler: async function (response) {
-          // 3. Verify Payment on our Flask Backend
+          // 3. Verify Payment on our local Backend
           try {
             const verifyResponse = await fetch(`${BACKEND_URL}/verify-payment`, {
               method: 'POST',
