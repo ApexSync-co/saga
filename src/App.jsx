@@ -33,6 +33,7 @@ const Rings = lazyWithRetry(() => import('./Pages/Rings'))
 const Sets = lazyWithRetry(() => import('./Pages/Sets'))
 const SignIn = lazyWithRetry(() => import('./Pages/SignIn'))
 const SignUp = lazyWithRetry(() => import('./Pages/SignUp'))
+const ForgotPassword = lazyWithRetry(() => import('./Pages/ForgotPassword'))
 const Cart = lazyWithRetry(() => import('./Pages/Cart'))
 const DeliveryAddress = lazyWithRetry(() => import('./Pages/NavbarPages/DeliveryAddress'))
 const Payment = lazyWithRetry(() => import('./Pages/NavbarPages/Payment'))
@@ -73,6 +74,7 @@ function App() {
       <Route path="/sets" element={<Sets />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/delivery-address" element={<DeliveryAddress />} />
       <Route path="/payment-methods" element={<Payment />} />

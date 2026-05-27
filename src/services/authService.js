@@ -12,6 +12,12 @@ import {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
 } from 'firebase/auth';
 
 /**
@@ -57,9 +63,12 @@ export async function registerCustomer(email, password, firstName, lastName = ''
  * Log in a customer
  * @param {string} email
  * @param {string} password
+ * @param {boolean} rememberMe
  */
-export async function loginCustomer(email, password) {
+export async function loginCustomer(email, password, rememberMe = true) {
   try {
+    const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+    await setPersistence(auth, persistence);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -135,4 +144,45 @@ export function onAuthChange(callback) {
       callback(null);
     }
   });
+}
+
+/**
+ * Log in/Sign up a customer using Google Sign-In
+ */
+export async function loginWithGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+
+    return {
+      id: user.uid,
+      email: user.email,
+      name: user.displayName || user.email.split('@')[0],
+    };
+  } catch (error) {
+    console.error("Error logging in with Google:", error);
+    throw new Error(error.message || 'Google login failed. Please try again.');
+  }
+}
+
+/**
+ * Send password reset email
+ * @param {string} email
+ */
+export async function resetCustomerPassword(email) {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    switch (error.code) {
+      case 'auth/user-not-found':
+        throw new Error('No account found with this email.');
+      case 'auth/invalid-email':
+        throw new Error('Please enter a valid email address.');
+      default:
+        throw new Error(error.message || 'Failed to send password reset email.');
+    }
+  }
 }
