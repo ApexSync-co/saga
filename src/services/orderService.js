@@ -19,6 +19,7 @@ import {
 } from 'firebase/firestore';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const DELIVERY_BACKEND_URL = import.meta.env.VITE_DELIVERY_BACKEND_URL || 'http://localhost:5001';
 const ORDERS_COLLECTION = 'orders';
 
 /**
@@ -45,7 +46,7 @@ export async function saveOrder(orderData) {
     // We keep this separate for now to allow order success even if shipping API is down
     if (result.orderId) {
         try {
-            await fetch(`${BACKEND_URL}/create-consignment`, {
+            await fetch(`${DELIVERY_BACKEND_URL}/create-consignment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

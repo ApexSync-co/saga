@@ -4,7 +4,7 @@
  * Handles order tracking with DTDC via our Vercel Backend.
  */
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const DELIVERY_BACKEND_URL = import.meta.env.VITE_DELIVERY_BACKEND_URL || 'http://localhost:5001';
 
 /**
  * Call the Vercel track-order endpoint for DTDC tracking results.
@@ -13,7 +13,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
  */
 export async function trackOrder(awbNumber) {
   try {
-    const response = await fetch(`${BACKEND_URL}/track-order`, {
+    const response = await fetch(`${DELIVERY_BACKEND_URL}/track-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

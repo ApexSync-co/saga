@@ -8,4 +8,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    // Disable module preloading to prevent Chrome from flagging preloaded chunks that are not immediately navigated to.
+    modulePreload: false,
+  },
 })

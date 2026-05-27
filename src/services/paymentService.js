@@ -44,7 +44,9 @@ export const initiatePayment = async ({ amount, customerName, customerEmail, cus
       currency: orderData.currency,
       name: "Saga",
       description: "Jewelry Purchase",
-      image: "/SAGA LOGO.PNG",
+      image: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? undefined
+        : `${window.location.origin}/SAGA%20LOGO.PNG`,
       order_id: orderData.id,
       handler: async function (response) {
         // 3. Verify Payment on our Flask Backend
