@@ -15,7 +15,8 @@ import {
   writeBatch,
   doc,
   increment,
-  onSnapshot
+  onSnapshot,
+  updateDoc
 } from 'firebase/firestore';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -157,4 +158,45 @@ export function subscribeToUserOrders(userId, onOrdersUpdate, onError) {
     unsubscribe();
     if (unsubscribe._fallback) unsubscribe._fallback();
   };
+}
+
+/**
+ * Cancel an order by a customer
+ * @param {string} orderId 
+ */
+export async function cancelOrder(orderId) {
+  try {
+    // Call backend to update status to Cancelled (which ensures consistency)
+    const response = await fetch(`${BACKEND_URL}/update-order-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        orderId,
+        status: 'Cancelled',
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to cancel order');
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    // Fallback: update status to Cancelled directly in Firestore if backend fails
+    try {
+      const docRef = doc(db, ORDERS_COLLECTION, orderId);
+      await updateDoc(docRef, {
+        status: 'Cancelled',
+        updatedAt: new Date()
+      });
+      return true;
+    } catch (dbError) {
+      console.error("Firestore cancellation fallback failed:", dbError);
+      throw error;
+    }
+  }
 }

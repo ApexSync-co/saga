@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
-import { subscribeToUserOrders } from '../../services/orderService';
+import { subscribeToUserOrders, cancelOrder } from '../../services/orderService';
 import { trackOrder } from '../../services/trackingService';
 import TrackingDisplay from '../../Components/TrackingDisplay';
 
@@ -44,6 +44,20 @@ const MyOrders = () => {
     const [trackingData, setTrackingData] = useState(null);
     const [trackingLoading, setTrackingLoading] = useState(false);
     const [isDemoTracking, setIsDemoTracking] = useState(false);
+    const [cancellingOrderId, setCancellingOrderId] = useState(null);
+
+    const handleCancelOrder = async (orderId) => {
+        if (!window.confirm("Are you sure you want to cancel this order?")) return;
+        setCancellingOrderId(orderId);
+        try {
+            await cancelOrder(orderId);
+        } catch (error) {
+            console.error("Failed to cancel order:", error);
+            alert("Failed to cancel order. Please try again or contact support.");
+        } finally {
+            setCancellingOrderId(null);
+        }
+    };
 
     useEffect(() => {
         if (!user) {
@@ -197,17 +211,28 @@ const MyOrders = () => {
 
                                         {/* Actions */}
                                         <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
-                                            <button 
-                                                onClick={() => handleTrackOrder(order)}
-                                                disabled={trackingLoading}
-                                                className="flex-1 group/btn relative overflow-hidden bg-white text-black py-4 px-6 text-[10px] uppercase font-bold tracking-[0.4em] transition-all duration-500 rounded-sm disabled:opacity-50"
-                                            >
-                                                <span className="relative z-10">
-                                                    {trackingLoading ? 'Locating...' : 'Track Shipment'}
-                                                </span>
-                                                <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500"></div>
-                                            </button>
+                                            {(order.trackingId || order.awb || order.awbNumber) && (
+                                                <button 
+                                                    onClick={() => handleTrackOrder(order)}
+                                                    disabled={trackingLoading}
+                                                    className="flex-1 group/btn relative overflow-hidden bg-white text-black py-4 px-6 text-[10px] uppercase font-bold tracking-[0.4em] transition-all duration-500 rounded-sm disabled:opacity-50"
+                                                >
+                                                    <span className="relative z-10">
+                                                        {trackingLoading ? 'Locating...' : 'Track Shipment'}
+                                                    </span>
+                                                    <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500"></div>
+                                                </button>
+                                            )}
 
+                                            {['Pending', 'Processing', 'Confirmed', 'Packed'].includes(order.status) && (
+                                                <button 
+                                                    onClick={() => handleCancelOrder(order.id)}
+                                                    disabled={cancellingOrderId === order.id}
+                                                    className="flex-1 border border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white py-4 px-6 text-[10px] uppercase font-bold tracking-[0.4em] transition-all duration-500 rounded-sm disabled:opacity-50"
+                                                >
+                                                    {cancellingOrderId === order.id ? 'Cancelling...' : 'Cancel Order'}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
