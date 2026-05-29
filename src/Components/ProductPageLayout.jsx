@@ -131,104 +131,129 @@ const ProductPageLayout = ({ title, products }) => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto">
-          {sortedProducts.map((item, index) => (
-            <div 
-              key={item.id} 
-              onMouseEnter={() => setHoveredId(item.id)}
-              onMouseLeave={() => setHoveredId(null)}
-              onClick={() => navigate(`/product/${item.id}`)}
-              className={`group relative flex flex-col md:flex-row h-auto md:h-96 transition-all duration-700 cursor-pointer 
-              bg-[#111] rounded-xl md:rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl
-              hover:border-primary/20 hover:shadow-primary/5 hover:scale-[1.01]
-              ${showBlur && hoveredId !== item.id ? 'md:opacity-40 md:blur-sm' : 'z-10'}
-              ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}
-              `}
-            >
-              {/* Image Section */}
-              <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden">
-                <img 
-                  src={item.image} 
-                  alt="" aria-hidden="true" 
-                  className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
-                />
-                
-                {/* Radial Overlay */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
-                
-                {/* Stock Status Badges */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  {item.stock <= 5 && item.stock > 0 ? (
-                    <span className="text-orange-400 text-[10px] font-bold tracking-widest uppercase bg-orange-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-500/30 w-fit">
-                      Low Stock
-                    </span>
-                  ) : item.stock === 0 ? (
-                    <span className="text-red-400 text-[10px] font-bold tracking-widest uppercase bg-red-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-red-500/30 w-fit">
-                      Out of Stock
-                    </span>
-                  ) : null}
-                </div>
+          {sortedProducts.length === 0 ? (
+            <div className="col-span-full py-20 px-6 text-center max-w-xl mx-auto bg-black/40 border border-white/5 rounded-3xl backdrop-blur-md shadow-2xl flex flex-col items-center animate-fade-in">
+              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-primary">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0Zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Z" />
+                </svg>
               </div>
+              
+              <h3 className="text-xl md:text-2xl font-light text-white uppercase tracking-wider mb-3 font-Poppins">
+                No Pieces Found
+              </h3>
+              
+              <p className="text-zinc-400 text-xs md:text-sm font-light leading-relaxed mb-8 max-w-sm">
+                Our artisans are currently crafting new designs for this collection. Please explore our other signature categories.
+              </p>
 
-              {/* Content Section */}
-              <div className="w-full md:w-[40%] p-4 md:p-10 flex flex-col justify-between bg-gradient-to-br from-[#111] to-[#000]">
-                <div className="space-y-2 md:space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <span className="h-[1px] w-4 md:w-8 bg-primary/40"></span>
-                      <p className="text-zinc-500 font-Poppins text-[8px] md:text-[9px] tracking-[0.3em] md:tracking-[0.5em] uppercase italic">Signature</p>
-                    </div>
-                  </div>
-
-                  <h3 className="text-white text-center text-base md:text-2xl md:tracking-wider font-Great_Vibes font-medium leading-tight group-hover:text-primary transition-colors duration-500 line-clamp-1 md:line-clamp-2">
-                    {item.name}
-                  </h3>
-
-                   <p className="font-Poppins text-[12px] md:text-2xl text-center tracking-tight text-white mb-2">{item.price}</p>
-                   
-                   {/* Minimalistic Star + Number Rating - Larger Stars */}
-                   <div className="flex justify-center items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity duration-700">
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className={`text-[12px] md:text-[18px] ${i < Math.floor(item.rating || 5) ? 'text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]' : 'text-zinc-800'}`}>
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                   </div>
-
-                    <div className="flex items-center justify-center gap-2 mt-4 opacity-70">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 text-green-400">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                      </svg>
-                      <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-medium">Ships in 2-3 Days</span>
-                    </div>
-                </div>
-
-                <div className="mt-4 md:mt-0 flex flex-col gap-3 md:gap-4">
-                  <div className="hidden md:flex gap-1">
-                    <span className="h-[1px] w-4 md:w-full bg-primary/40"></span>
-                  </div>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(item);
-                      const btn = e.currentTarget;
-                      const originalText = btn.textContent;
-                      btn.textContent = "✓";
-                      btn.classList.add('bg-primary', 'text-black', 'border-primary');
-                      setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.classList.remove('bg-primary', 'text-black', 'border-primary');
-                      }, 2000);
-                    }}
-                    className="w-full bg-white/5 hover:bg-white text-zinc-100 hover:text-black py-2.5 md:py-4 rounded-lg font-Poppins text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.2em] uppercase transition-all duration-500 border border-white/10 active:scale-[0.98] flex items-center justify-center"
-                  >
-                    ADD TO CART
-                  </button>
-                </div>
-              </div>
+              <button 
+                onClick={() => navigate('/products')}
+                className="px-8 py-3.5 bg-white text-black font-semibold text-[10px] tracking-widest uppercase hover:bg-primary hover:text-white hover:shadow-[0_0_15px_rgba(251,112,16,0.3)] transition-all duration-300 rounded-sm cursor-pointer"
+              >
+                Explore All Collections
+              </button>
             </div>
-          ))}
+          ) : (
+            sortedProducts.map((item, index) => (
+              <div 
+                key={item.id} 
+                onMouseEnter={() => setHoveredId(item.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={() => navigate(`/product/${item.id}`)}
+                className={`group relative flex flex-col md:flex-row h-auto md:h-96 transition-all duration-700 cursor-pointer 
+                bg-[#111] rounded-xl md:rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl
+                hover:border-primary/20 hover:shadow-primary/5 hover:scale-[1.01]
+                ${showBlur && hoveredId !== item.id ? 'md:opacity-40 md:blur-sm' : 'z-10'}
+                ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}
+                `}
+              >
+                {/* Image Section */}
+                <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden">
+                  <img 
+                    src={item.image} 
+                    alt="" aria-hidden="true" 
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
+                  />
+                  
+                  {/* Radial Overlay */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
+                  
+                  {/* Stock Status Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    {item.stock <= 5 && item.stock > 0 ? (
+                      <span className="text-orange-400 text-[10px] font-bold tracking-widest uppercase bg-orange-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-500/30 w-fit">
+                        Low Stock
+                      </span>
+                    ) : item.stock === 0 ? (
+                      <span className="text-red-400 text-[10px] font-bold tracking-widest uppercase bg-red-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-red-500/30 w-fit">
+                        Out of Stock
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="w-full md:w-[40%] p-4 md:p-10 flex flex-col justify-between bg-gradient-to-br from-[#111] to-[#000]">
+                  <div className="space-y-2 md:space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <span className="h-[1px] w-4 md:w-8 bg-primary/40"></span>
+                        <p className="text-zinc-500 font-Poppins text-[8px] md:text-[9px] tracking-[0.3em] md:tracking-[0.5em] uppercase italic">Signature</p>
+                      </div>
+                    </div>
+
+                    <h3 className="text-white text-center text-base md:text-2xl md:tracking-wider font-Great_Vibes font-medium leading-tight group-hover:text-primary transition-colors duration-500 line-clamp-1 md:line-clamp-2">
+                      {item.name}
+                    </h3>
+
+                     <p className="font-Poppins text-[12px] md:text-2xl text-center tracking-tight text-white mb-2">{item.price}</p>
+                     
+                     {/* Minimalistic Star + Number Rating - Larger Stars */}
+                     <div className="flex justify-center items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+                        <div className="flex gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className={`text-[12px] md:text-[18px] ${i < Math.floor(item.rating || 5) ? 'text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]' : 'text-zinc-800'}`}>
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                     </div>
+
+                      <div className="flex items-center justify-center gap-2 mt-4 opacity-70">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 text-green-400">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                        </svg>
+                        <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-medium">Ships in 2-3 Days</span>
+                      </div>
+                  </div>
+
+                  <div className="mt-4 md:mt-0 flex flex-col gap-3 md:gap-4">
+                    <div className="hidden md:flex gap-1">
+                      <span className="h-[1px] w-4 md:w-full bg-primary/40"></span>
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(item);
+                        const btn = e.currentTarget;
+                        const originalText = btn.textContent;
+                        btn.textContent = "✓";
+                        btn.classList.add('bg-primary', 'text-black', 'border-primary');
+                        setTimeout(() => {
+                          btn.textContent = originalText;
+                          btn.classList.remove('bg-primary', 'text-black', 'border-primary');
+                        }, 2000);
+                      }}
+                      className="w-full bg-white/5 hover:bg-white text-zinc-100 hover:text-black py-2.5 md:py-4 rounded-lg font-Poppins text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.2em] uppercase transition-all duration-500 border border-white/10 active:scale-[0.98] flex items-center justify-center"
+                    >
+                      ADD TO CART
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

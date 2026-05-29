@@ -8,6 +8,7 @@ import {
     validateAddressForDTDC,
     setDefaultAddress
 } from '../../services/addressService';
+import CustomModal from '../../Components/CustomModal';
 
 const DeliveryAddress = () => {
     const { user } = useAuth();
@@ -29,6 +30,48 @@ const DeliveryAddress = () => {
         phone: '',
         isDefault: false
     });
+
+    const [modalConfig, setModalConfig] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'confirm',
+        confirmText: 'OK',
+        cancelText: 'Cancel',
+        isDanger: false,
+        onConfirm: () => {}
+    });
+
+    const showConfirm = (title, message, onConfirm, isDanger = false) => {
+        setModalConfig({
+            isOpen: true,
+            title,
+            message,
+            type: 'confirm',
+            confirmText: 'Yes, Delete',
+            cancelText: 'Cancel',
+            isDanger,
+            onConfirm: () => {
+                onConfirm();
+                setModalConfig(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
+    const showAlert = (title, message) => {
+        setModalConfig({
+            isOpen: true,
+            title,
+            message,
+            type: 'alert',
+            confirmText: 'OK',
+            cancelText: '',
+            isDanger: false,
+            onConfirm: () => {
+                setModalConfig(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
 
     useEffect(() => {
         const loadAddresses = async () => {
@@ -126,7 +169,7 @@ const DeliveryAddress = () => {
             setIsModalOpen(false);
             resetForm();
         } catch (error) {
-            alert("Failed to save address. Please try again.");
+            showAlert("Save Error", "Failed to save address. Please try again.");
             console.error(error);
         }
     };
@@ -137,19 +180,24 @@ const DeliveryAddress = () => {
             const data = await fetchUserAddresses(user.id);
             setAddresses(data);
         } catch {
-            alert("Failed to set default address.");
+            showAlert("Error", "Failed to set default address.");
         }
     };
 
-    const handleDeleteAddress = async (id) => {
-        if (window.confirm("Are you sure you want to delete this address?")) {
-            try {
-                await removeAddress(id);
-                setAddresses(addresses.filter(addr => addr.id !== id));
-            } catch {
-                alert("Failed to delete address.");
-            }
-        }
+    const handleDeleteAddress = (id) => {
+        showConfirm(
+            "Delete Address",
+            "Are you sure you want to delete this address? This action cannot be undone.",
+            async () => {
+                try {
+                    await removeAddress(id);
+                    setAddresses(addresses.filter(addr => addr.id !== id));
+                } catch {
+                    showAlert("Error", "Failed to delete address.");
+                }
+            },
+            true
+        );
     };
 
     if (loading) {
@@ -418,6 +466,18 @@ const DeliveryAddress = () => {
                     </div>
                 )}
             </div>
+
+            <CustomModal 
+                isOpen={modalConfig.isOpen}
+                onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={modalConfig.onConfirm}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                type={modalConfig.type}
+                confirmText={modalConfig.confirmText}
+                cancelText={modalConfig.cancelText}
+                isDanger={modalConfig.isDanger}
+            />
         </div>
     );
 };

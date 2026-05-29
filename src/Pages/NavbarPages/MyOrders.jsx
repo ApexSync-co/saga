@@ -3,6 +3,7 @@ import { useAuth } from '../../Context/AuthContext';
 import { subscribeToUserOrders, cancelOrder } from '../../services/orderService';
 import { trackOrder } from '../../services/trackingService';
 import TrackingDisplay from '../../Components/TrackingDisplay';
+import CustomModal from '../../Components/CustomModal';
 
 const DEMO_ORDERS = [
     {
@@ -37,6 +38,32 @@ const DEMO_ORDERS = [
     }
 ];
 
+const STEPS = [
+    { label: 'Confirmed', desc: 'Order received and confirmed' },
+    { label: 'Packed', desc: 'Item packed and ready to ship' },
+    { label: 'Shipped', desc: 'Handed over to courier' },
+    { label: 'Out for Delivery', desc: 'Shipment out for delivery' },
+    { label: 'Delivered', desc: 'Successfully delivered' }
+];
+
+const getStageIndex = (status) => {
+    if (status === 'Cancelled' || status === 'Refunded' || status === 'Returned') {
+        return -1;
+    }
+    const indexMap = {
+        'Pending': 0,
+        'Processing': 0,
+        'Confirmed': 0,
+        'Packed': 1,
+        'Ready to Ship': 1,
+        'Shipped': 2,
+        'In Transit': 2,
+        'Out for Delivery': 3,
+        'Delivered': 4
+    };
+    return indexMap[status] !== undefined ? indexMap[status] : 0;
+};
+
 const MyOrders = () => {
     const { user } = useAuth();
     const [orders, setOrders] = useState([]);
@@ -45,18 +72,65 @@ const MyOrders = () => {
     const [trackingLoading, setTrackingLoading] = useState(false);
     const [isDemoTracking, setIsDemoTracking] = useState(false);
     const [cancellingOrderId, setCancellingOrderId] = useState(null);
+    const [modalConfig, setModalConfig] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'confirm',
+        confirmText: 'OK',
+        cancelText: 'Cancel',
+        isDanger: false,
+        onConfirm: () => {}
+    });
 
-    const handleCancelOrder = async (orderId) => {
-        if (!window.confirm("Are you sure you want to cancel this order?")) return;
-        setCancellingOrderId(orderId);
-        try {
-            await cancelOrder(orderId);
-        } catch (error) {
-            console.error("Failed to cancel order:", error);
-            alert("Failed to cancel order. Please try again or contact support.");
-        } finally {
-            setCancellingOrderId(null);
-        }
+    const showConfirm = (title, message, onConfirm, isDanger = false) => {
+        setModalConfig({
+            isOpen: true,
+            title,
+            message,
+            type: 'confirm',
+            confirmText: 'Yes, Cancel',
+            cancelText: 'No, Keep',
+            isDanger,
+            onConfirm: () => {
+                onConfirm();
+                setModalConfig(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
+    const showAlert = (title, message) => {
+        setModalConfig({
+            isOpen: true,
+            title,
+            message,
+            type: 'alert',
+            confirmText: 'OK',
+            cancelText: '',
+            isDanger: false,
+            onConfirm: () => {
+                setModalConfig(prev => ({ ...prev, isOpen: false }));
+            }
+        });
+    };
+
+    const handleCancelOrder = (orderId) => {
+        showConfirm(
+            "Cancel Order", 
+            "Are you sure you want to cancel this order? This action cannot be undone.", 
+            async () => {
+                setCancellingOrderId(orderId);
+                try {
+                    await cancelOrder(orderId);
+                } catch (error) {
+                    console.error("Failed to cancel order:", error);
+                    showAlert("Cancellation Failed", "Failed to cancel order. Please try again or contact support.");
+                } finally {
+                    setCancellingOrderId(null);
+                }
+            },
+            true
+        );
     };
 
     useEffect(() => {
@@ -235,12 +309,134 @@ const MyOrders = () => {
                                             )}
                                         </div>
                                     </div>
+                                    
+                                    {/* Progress Tracker Graph */}
+                                    <div className="mt-10 pt-8 border-t border-white/5">
+                                        {['Cancelled', 'Refunded', 'Returned'].includes(order.status) ? (
+                                            <div className="flex items-center gap-3 p-4 bg-red-950/10 border border-red-500/20 text-red-400 rounded-sm">
+                                                <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span className="text-xs uppercase tracking-wider font-semibold">
+                                                    Order Status: {order.status}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <p className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/20 mb-6">Delivery Progress</p>
+                                                
+                                                {/* Desktop/Tablet Horizontal Tracker */}
+                                                <div className="relative hidden sm:flex justify-between items-center w-full px-6">
+                                                    {/* Background line */}
+                                                    <div className="absolute top-[18px] left-[50px] right-[50px] h-[2px] bg-white/5 z-0" />
+                                                    
+                                                    {STEPS.map((step, idx) => {
+                                                        const currentIdx = getStageIndex(order.status);
+                                                        const isCompleted = idx <= currentIdx;
+                                                        const isActive = idx === currentIdx;
+                                                        const isNextCompleted = idx + 1 <= currentIdx;
+                                                        return (
+                                                            <div key={idx} className="flex-1 flex items-center relative">
+                                                                <div className="flex flex-col items-center z-10 w-full">
+                                                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-700 ${
+                                                                        isActive 
+                                                                        ? 'bg-black border-primary text-primary shadow-[0_0_15px_rgba(251,112,16,0.3)] scale-110' 
+                                                                        : isCompleted 
+                                                                        ? 'bg-primary border-primary text-black' 
+                                                                        : 'bg-zinc-950 border-white/10 text-white/30'
+                                                                    }`}>
+                                                                        {isCompleted && !isActive ? (
+                                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                                            </svg>
+                                                                        ) : (
+                                                                            <span className="text-xs font-semibold">{idx + 1}</span>
+                                                                        )}
+                                                                    </div>
+                                                                    <span className={`text-[9px] mt-3 font-semibold uppercase tracking-widest text-center ${
+                                                                        isActive ? 'text-primary' : isCompleted ? 'text-white/80' : 'text-white/30'
+                                                                    }`}>
+                                                                        {step.label}
+                                                                    </span>
+                                                                </div>
+                                                                {/* Segment Line */}
+                                                                {idx < STEPS.length - 1 && (
+                                                                    <div className="absolute top-[18px] left-[calc(50%+18px)] right-[calc(-50%+18px)] h-[2px] z-0">
+                                                                        <div className={`h-full w-full transition-all duration-700 ${isNextCompleted ? 'bg-primary' : 'bg-white/5'}`} />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                {/* Mobile Vertical Tracker */}
+                                                <div className="relative sm:hidden flex flex-col gap-6 pl-4 py-2">
+                                                    {/* Background line */}
+                                                    <div className="absolute top-[18px] bottom-[18px] left-[18px] w-[2px] bg-white/5 z-0" />
+                                                    {/* Progress line */}
+                                                    <div 
+                                                        className="absolute top-[18px] left-[18px] w-[2px] bg-primary transition-all duration-1000 ease-out z-0" 
+                                                        style={{ 
+                                                            height: `${(getStageIndex(order.status) / (STEPS.length - 1)) * 100}%`,
+                                                            maxHeight: 'calc(100% - 36px)'
+                                                        }}
+                                                    />
+                                                    
+                                                    {STEPS.map((step, idx) => {
+                                                        const currentIdx = getStageIndex(order.status);
+                                                        const isCompleted = idx <= currentIdx;
+                                                        const isActive = idx === currentIdx;
+                                                        return (
+                                                            <div key={idx} className="relative z-10 flex items-center gap-4">
+                                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-700 shrink-0 ${
+                                                                    isActive 
+                                                                    ? 'bg-black border-primary text-primary shadow-[0_0_15px_rgba(251,112,16,0.3)] scale-105' 
+                                                                    : isCompleted 
+                                                                    ? 'bg-primary border-primary text-black' 
+                                                                    : 'bg-zinc-950 border-white/10 text-white/30'
+                                                                }`}>
+                                                                    {isCompleted && !isActive ? (
+                                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                                        </svg>
+                                                                    ) : (
+                                                                        <span className="text-xs font-semibold">{idx + 1}</span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex flex-col text-left">
+                                                                    <span className={`text-[10px] font-semibold uppercase tracking-widest ${
+                                                                        isActive ? 'text-primary' : isCompleted ? 'text-white/80' : 'text-white/30'
+                                                                    }`}>
+                                                                        {step.label}
+                                                                    </span>
+                                                                    <span className="text-[9px] text-white/40 mt-0.5">{step.desc}</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
+
+            <CustomModal 
+                isOpen={modalConfig.isOpen}
+                onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={modalConfig.onConfirm}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                type={modalConfig.type}
+                confirmText={modalConfig.confirmText}
+                cancelText={modalConfig.cancelText}
+                isDanger={modalConfig.isDanger}
+            />
         </div>
     );
 };
