@@ -50,7 +50,7 @@ const EthicalConsent = () => {
   const sections = {
     philosophy: (
       <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-primary font-Poppins">Our Ethical Philosophy — Content Checklist</h3>
+        <h3 className="text-xl font-semibold text-primary font-Poppins">Our Philosophy</h3>
         <p className="text-white/60 text-xs leading-relaxed italic">
           Please collect the following information from the client to populate this section:
         </p>
@@ -78,7 +78,7 @@ const EthicalConsent = () => {
     ),
     sourcing: (
       <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-primary font-Poppins">Responsible Sourcing — Content Checklist</h3>
+        <h3 className="text-xl font-semibold text-primary font-Poppins">Responsible Sourcing</h3>
         <p className="text-white/60 text-xs leading-relaxed italic">
           Please collect the following details from the client to populate this section:
         </p>
@@ -106,7 +106,7 @@ const EthicalConsent = () => {
     ),
     sustainability: (
       <div className="space-y-6">
-        <h3 className="text-xl font-semibold text-primary font-Poppins">Environmental Stewardship — Content Checklist</h3>
+        <h3 className="text-xl font-semibold text-primary font-Poppins">Environmental Stewardship</h3>
         <p className="text-white/60 text-xs leading-relaxed italic">
           Please collect the following information from the client to populate this section:
         </p>
@@ -221,7 +221,7 @@ const EthicalConsent = () => {
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h1 className="text-3xl md:text-4xl font-bold text-primary font-Poppins tracking-wide">
-          Ethical Standards & Consents
+          Ethics & Privacy
         </h1>
         <p className="text-white/60 text-xs md:text-sm mt-3 uppercase tracking-widest">
           Responsible curation. Transparent values. Your trust, respected.

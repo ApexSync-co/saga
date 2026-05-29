@@ -60,7 +60,7 @@ function Footer() {
             <div className="mt-12 pt-8 border-t border-gray-800 text-center text-xs text-gray-500 flex flex-col md:flex-row justify-between items-center gap-4 max-w-[1440px] mx-auto px-6 lg:px-12">
                 <p>&copy; {new Date().getFullYear()} Saga. All rights reserved.</p>
                 <div className="flex gap-6">
-                    <Link to="/ethical-consent" className="hover:text-primary transition-colors duration-300">Ethical Standards & Consents</Link>
+                    <Link to="/ethical-consent" className="hover:text-primary transition-colors duration-300">Ethics & Privacy</Link>
                     <Link to="/help" className="hover:text-primary transition-colors duration-300">Help & Support</Link>
                 </div>
             </div>
