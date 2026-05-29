@@ -132,26 +132,35 @@ const ProductPageLayout = ({ title, products }) => {
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto">
           {sortedProducts.length === 0 ? (
-            <div className="col-span-full py-20 px-6 text-center max-w-xl mx-auto bg-black/40 border border-white/5 rounded-3xl backdrop-blur-md shadow-2xl flex flex-col items-center animate-fade-in">
-              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-primary">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0Zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Z" />
+            <div className="col-span-full py-24 px-8 text-center max-w-xl mx-auto bg-black/40 border border-white/10 rounded-[2rem] backdrop-blur-xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] flex flex-col items-center relative overflow-hidden animate-fade-in">
+              {/* Subtle top gold accent bar */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+              
+              {/* Elegant Glowing Icon */}
+              <div className="relative w-20 h-20 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center mb-8">
+                {/* Outer pulsing ring */}
+                <div className="absolute inset-0 rounded-full border border-primary/20 animate-ping opacity-25" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-10 h-10 text-primary">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5h-1.875a6 6 0 0 0-11.25 0H6.125m15.75 0A3 3 0 0 1 22 10.5v8.25A3 3 0 0 1 19 21.75H5a3 3 0 0 1-3-3.25V10.5a3 3 0 0 1 2.125-2.875m15.75 0V6a6 6 0 0 0-12 0v1.5m12 0a2.25 2.25 0 0 0-2.25-2.25h-7.5A2.25 2.25 0 0 0 6.125 7.5" />
                 </svg>
               </div>
               
-              <h3 className="text-xl md:text-2xl font-light text-white uppercase tracking-wider mb-3 font-Poppins">
-                No Pieces Found
+              {/* Premium Typography */}
+              <h3 className="text-white font-Great_Vibes text-5xl mb-4 tracking-wider">
+                Curating New Brilliance
               </h3>
               
-              <p className="text-zinc-400 text-xs md:text-sm font-light leading-relaxed mb-8 max-w-sm">
-                Our artisans are currently crafting new designs for this collection. Please explore our other signature categories.
+              <p className="text-zinc-400 font-Poppins text-xs md:text-sm font-light leading-relaxed mb-10 max-w-sm tracking-wide">
+                Our master artisans are currently crafting new signature designs for this collection. Please explore our other signature categories.
               </p>
 
+              {/* Sleek Glass Button */}
               <button 
                 onClick={() => navigate('/products')}
-                className="px-8 py-3.5 bg-white text-black font-semibold text-[10px] tracking-widest uppercase hover:bg-primary hover:text-white hover:shadow-[0_0_15px_rgba(251,112,16,0.3)] transition-all duration-300 rounded-sm cursor-pointer"
+                className="group/btn relative px-8 py-3.5 bg-transparent text-white border border-primary/30 hover:border-primary text-[10px] tracking-[0.2em] uppercase font-bold transition-all duration-500 rounded-full overflow-hidden cursor-pointer shadow-[0_0_15px_rgba(251,112,16,0.05)] hover:shadow-[0_0_25px_rgba(251,112,16,0.2)]"
               >
-                Explore All Collections
+                <span className="relative z-10 group-hover/btn:text-black transition-colors duration-500">Explore Collections</span>
+                <div className="absolute inset-0 bg-primary translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500 z-0" />
               </button>
             </div>
           ) : (

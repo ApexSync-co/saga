@@ -28,18 +28,29 @@ const Help = () => {
                                 </span>
                             </summary>
                             <p className="text-white/70 mt-3 group-open:animate-fadeIn text-sm leading-relaxed">
-                                We accept returns within 7 days of delivery. The item must be unused and in its original packaging. Please contact support to initiate a return.
+                                We do not have a return policy. All sales are final, and we do not accept returns or replacements.
                             </p>
                         </details>
                         <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
                             <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
-                                Do you ship internationally?
+                                Do you ship internationally or to other states?
                                 <span className="transition group-open:rotate-180 group-open:text-primary">
                                     <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                                 </span>
                             </summary>
                             <p className="text-white/70 mt-3 group-open:animate-fadeIn text-sm leading-relaxed">
-                                Currently, we only ship within India. We are working on expanding our delivery network to international locations soon.
+                                Currently, we deliver only within Kerala state. We do not ship to other states or international locations at this moment.
+                            </p>
+                        </details>
+                        <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
+                            <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
+                                Do you support Cash on Delivery (COD)?
+                                <span className="transition group-open:rotate-180 group-open:text-primary">
+                                    <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                                </span>
+                            </summary>
+                            <p className="text-white/70 mt-3 group-open:animate-fadeIn text-sm leading-relaxed">
+                                No, we do not support Cash on Delivery (COD). We only accept online prepaid payments (UPI, Card, Net Banking).
                             </p>
                         </details>
 

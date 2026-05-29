@@ -16,14 +16,6 @@ const FestiveCarousel = ({ carousel }) => {
 
     return (
         <div className="md:col-span-6 md:row-span-2 relative group overflow-hidden rounded-4xl md:rounded-[2rem] min-h-[60svh] md:h-auto shadow-2xl">
-            {/* Mobile Title Overlay */}
-            <div className="md:hidden absolute top-6 right-4 z-30 pointer-events-none">
-                <h2 className="text-white text-4xl tracking-wider leading-[0.8] text-right drop-shadow-lg flex flex-col gap-2">
-                    <span>Festive</span>
-                    <span>Edit</span>
-                </h2>
-            </div>
-
             {carousel.map((item, index) => (
                 <div 
                     key={index}

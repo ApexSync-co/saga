@@ -668,6 +668,30 @@ export default function Cart() {
                                  <p className="text-xs text-zinc-500 mt-2">Including all taxes</p>
                              </div>
 
+                             {/* Store Policies / Disclaimers */}
+                             <div className="mb-6 p-4 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md space-y-3 text-xs text-zinc-400">
+                                 <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-[10px]">
+                                     <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                     </svg>
+                                     Delivery & Return Policies
+                                 </div>
+                                 <ul className="space-y-2 list-none p-0 m-0">
+                                     <li className="flex items-start gap-2">
+                                         <span className="text-primary mt-0.5">•</span>
+                                         <span><strong>Kerala Delivery Only:</strong> Fulfilling orders exclusively within Kerala state.</span>
+                                     </li>
+                                     <li className="flex items-start gap-2">
+                                         <span className="text-primary mt-0.5">•</span>
+                                         <span><strong>Prepaid Orders Only:</strong> Cash on Delivery (COD) is not supported.</span>
+                                     </li>
+                                     <li className="flex items-start gap-2">
+                                         <span className="text-primary mt-0.5">•</span>
+                                         <span><strong>No Returns:</strong> All sales are final. Returns/replacements not accepted.</span>
+                                     </li>
+                                 </ul>
+                             </div>
+
                             {error && (
                                 <div className="bg-red-900/40 border border-red-500/50 text-red-200 text-xs p-3 rounded mb-4">
                                     {error}
