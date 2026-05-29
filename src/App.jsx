@@ -44,6 +44,8 @@ const Settings = lazyWithRetry(() => import('./Pages/NavbarPages/Settings'))
 const ProductOverview = lazyWithRetry(() => import('./Pages/ProductOverview'))
 const ProductDetail = lazyWithRetry(() => import('./Pages/ProductDetail'))
 const OrderSuccess = lazyWithRetry(() => import('./Pages/OrderSuccess'))
+const EthicalConsent = lazyWithRetry(() => import('./Pages/EthicalConsent'))
+const NotFound = lazyWithRetry(() => import('./Pages/NotFound'))
 
 // Loading component for Suspense
 const PageLoader = () => (
@@ -83,6 +85,8 @@ function App() {
       <Route path="/my-orders" element={<MyOrders />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/ethical-consent" element={<EthicalConsent />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
     </Suspense>
     <Footer />

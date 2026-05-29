@@ -26,7 +26,7 @@ export default function Cart() {
         addressLine2: '',
         landmark: '',
         city: '',
-        state: '',
+        state: 'Kerala',
         pincode: '',
         phone: ''
     });
@@ -36,7 +36,108 @@ export default function Cart() {
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [isSavingAddress, setIsSavingAddress] = useState(false);
 
+    const [couponCodeInput, setCouponCodeInput] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [couponStatus, setCouponStatus] = useState(null);
+
     const total = getCartTotal();
+    const deliveryCharge = 50;
+    const platformFee = 20;
+    const discount = appliedCoupon ? appliedCoupon.discount : 0;
+    const finalTotal = Math.max(0, total + deliveryCharge + platformFee - discount);
+
+    useEffect(() => {
+        if (appliedCoupon) {
+            if (total < (appliedCoupon.minPurchase || 0)) {
+                setAppliedCoupon(null);
+                setCouponCodeInput('');
+                setCouponStatus({ success: false, message: `Coupon removed. Total fell below minimum purchase of ₹${appliedCoupon.minPurchase}.` });
+            } else {
+                let discountAmt = 0;
+                if (appliedCoupon.discountType === 'percentage') {
+                    discountAmt = total * (parseFloat(appliedCoupon.discountValue) / 100);
+                } else {
+                    discountAmt = parseFloat(appliedCoupon.discountValue) || 0;
+                }
+                discountAmt = Math.min(discountAmt, total);
+                setAppliedCoupon(prev => ({ ...prev, discount: discountAmt }));
+            }
+        }
+    }, [total]);
+
+    const handleApplyCoupon = async () => {
+        if (!couponCodeInput.trim()) return;
+        setError(null);
+        setCouponStatus(null);
+        try {
+            const code = couponCodeInput.trim().toUpperCase();
+            const { doc, getDoc } = await import('firebase/firestore');
+            const { db } = await import('../services/firebase');
+            const couponRef = doc(db, 'coupons', code);
+            const couponSnap = await getDoc(couponRef);
+
+            if (!couponSnap.exists()) {
+                setCouponStatus({ success: false, message: 'Invalid coupon code.' });
+                return;
+            }
+
+            const data = couponSnap.data();
+
+            if (!data.isActive) {
+                setCouponStatus({ success: false, message: 'This coupon is inactive.' });
+                return;
+            }
+
+            if (data.expiresAt) {
+                const expires = data.expiresAt.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
+                if (expires < new Date()) {
+                    setCouponStatus({ success: false, message: 'This coupon has expired.' });
+                    return;
+                }
+            }
+
+            if (data.maxUses !== undefined && data.maxUses !== null) {
+                const usedCount = data.usedCount || 0;
+                if (usedCount >= data.maxUses) {
+                    setCouponStatus({ success: false, message: 'This coupon usage limit has been reached.' });
+                    return;
+                }
+            }
+
+            const minPurchase = parseFloat(data.minPurchase) || 0;
+            if (total < minPurchase) {
+                setCouponStatus({ success: false, message: `Minimum purchase of ₹${minPurchase} is required for this coupon.` });
+                return;
+            }
+
+            let discountAmt = 0;
+            if (data.discountType === 'percentage') {
+                discountAmt = total * (parseFloat(data.discountValue) / 100);
+            } else {
+                discountAmt = parseFloat(data.discountValue) || 0;
+            }
+
+            discountAmt = Math.min(discountAmt, total);
+
+            setAppliedCoupon({
+                code: code,
+                discountType: data.discountType,
+                discountValue: data.discountValue,
+                minPurchase: minPurchase,
+                discount: discountAmt
+            });
+            setCouponStatus({ success: true, message: `Coupon applied! You saved ₹${discountAmt.toLocaleString('en-IN')}.` });
+        } catch (err) {
+            console.error("Error applying coupon:", err);
+            setCouponStatus({ success: false, message: 'Failed to apply coupon. Please try again.' });
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCodeInput('');
+        setCouponStatus(null);
+    };
 
     useEffect(() => {
         const sharedId = searchParams.get('sharedId');
@@ -129,7 +230,7 @@ export default function Cart() {
             addressLine2: '',
             landmark: '',
             city: '', 
-            state: '',
+            state: 'Kerala',
             pincode: '', 
             phone: '' 
         });
@@ -147,6 +248,10 @@ export default function Cart() {
         }
         if (!address.name || !address.addressLine1 || !address.city || !address.state || !address.pincode || !address.phone) {
             setError('Please fill in all required address fields to save.');
+            return;
+        }
+        if (address.state.trim().toLowerCase() !== 'kerala') {
+            setError('We currently only deliver to Kerala.');
             return;
         }
         
@@ -196,6 +301,11 @@ export default function Cart() {
             return;
         }
 
+        if (address.state.trim().toLowerCase() !== 'kerala') {
+            setError('We currently only deliver to Kerala.');
+            return;
+        }
+
         setIsProcessing(true);
         setError(null);
 
@@ -214,13 +324,14 @@ export default function Cart() {
             }
 
             const result = await initiatePayment({
-                amount: total,
+                amount: finalTotal,
                 customerName: address.name || user.name || 'Saga Customer',
                 customerEmail: user.email,
                 customerPhone: address.phone,
                 userId: user.id,
                 items: cartItems,
-                address: address
+                address: address,
+                couponCode: appliedCoupon ? appliedCoupon.code : null
             });
 
             if (result.success) {
@@ -438,15 +549,15 @@ export default function Cart() {
                                              />
                                          </div>
                                          <div className="space-y-2">
-                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">State</label>
-                                             <input 
-                                                 type="text" 
+                                             <label className="text-xs text-zinc-400 uppercase tracking-widest">State (Delivery to Kerala Only)</label>
+                                             <select 
                                                  name="state"
                                                  value={address.state}
                                                  onChange={handleAddressChange}
-                                                 placeholder="e.g. Maharashtra" 
-                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white"
-                                             />
+                                                 className="w-full bg-black border border-zinc-800 p-3 text-sm focus:border-white outline-none transition-colors text-white cursor-pointer"
+                                             >
+                                                 <option value="Kerala">Kerala</option>
+                                             </select>
                                          </div>
                                          <div className="space-y-2">
                                              <label className="text-xs text-zinc-400 uppercase tracking-widest">Pincode (6-digit)</label>
@@ -492,23 +603,70 @@ export default function Cart() {
                             <h2 className="text-2xl font-Great_Vibes mb-6">Order Summary</h2>
                             
                             <div className="space-y-4 mb-6 text-sm">
-                                <div className="flex justify-between text-zinc-400">
-                                    <span>Subtotal</span>
-                                    <span className="text-white">₹{total.toLocaleString('en-IN')}</span>
-                                </div>
-                                <div className="flex justify-between text-zinc-400">
-                                    <span>Shipping</span>
-                                    <span className="text-green-400">Free</span>
-                                </div>
-                            </div>
-                            
-                            <div className="border-t border-zinc-800 pt-4 mb-8">
-                                <div className="flex justify-between items-center text-lg">
-                                    <span>Total</span>
-                                    <span className="font-bold">₹{total.toLocaleString('en-IN')}</span>
-                                </div>
-                                <p className="text-xs text-zinc-500 mt-2">Including all taxes</p>
-                            </div>
+                                 <div className="flex justify-between text-zinc-400">
+                                     <span>Subtotal</span>
+                                     <span className="text-white">₹{total.toLocaleString('en-IN')}</span>
+                                 </div>
+                                 <div className="flex justify-between text-zinc-400">
+                                     <span>Delivery Charge</span>
+                                     <span className="text-white">₹{deliveryCharge}</span>
+                                 </div>
+                                 <div className="flex justify-between text-zinc-400">
+                                     <span>Platform Fee</span>
+                                     <span className="text-white">₹{platformFee}</span>
+                                 </div>
+                                 {appliedCoupon && (
+                                     <div className="flex justify-between text-green-400">
+                                         <span>Discount ({appliedCoupon.code})</span>
+                                         <span>-₹{appliedCoupon.discount.toLocaleString('en-IN')}</span>
+                                     </div>
+                                 )}
+                             </div>
+
+                             {/* Coupon Code Section */}
+                             <div className="border-t border-zinc-800 pt-6 mb-6">
+                                 <label className="text-xs text-zinc-400 uppercase tracking-widest block mb-2">Discount Coupon</label>
+                                 <div className="flex gap-2">
+                                     <input
+                                         type="text"
+                                         placeholder="Enter Coupon Code"
+                                         value={couponCodeInput}
+                                         onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                                         disabled={appliedCoupon || isProcessing}
+                                         className="flex-1 bg-black border border-zinc-800 p-2.5 text-sm focus:border-white outline-none transition-colors text-white uppercase"
+                                     />
+                                     {appliedCoupon ? (
+                                         <button
+                                             onClick={handleRemoveCoupon}
+                                             disabled={isProcessing}
+                                             className="bg-red-950 text-red-200 border border-red-800 hover:bg-red-900 px-4 py-2 text-xs uppercase tracking-wider font-semibold transition-colors"
+                                         >
+                                             Remove
+                                         </button>
+                                     ) : (
+                                         <button
+                                             onClick={handleApplyCoupon}
+                                             disabled={!couponCodeInput.trim() || isProcessing}
+                                             className="bg-zinc-800 text-white border border-zinc-700 hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 text-xs uppercase tracking-wider font-semibold transition-colors"
+                                         >
+                                             Apply
+                                         </button>
+                                     )}
+                                 </div>
+                                 {couponStatus && (
+                                     <p className={`text-xs mt-2 ${couponStatus.success ? 'text-green-400' : 'text-red-400'}`}>
+                                         {couponStatus.message}
+                                     </p>
+                                 )}
+                             </div>
+                             
+                             <div className="border-t border-zinc-800 pt-4 mb-8">
+                                 <div className="flex justify-between items-center text-lg">
+                                     <span>Total</span>
+                                     <span className="font-bold">₹{finalTotal.toLocaleString('en-IN')}</span>
+                                 </div>
+                                 <p className="text-xs text-zinc-500 mt-2">Including all taxes</p>
+                             </div>
 
                             {error && (
                                 <div className="bg-red-900/40 border border-red-500/50 text-red-200 text-xs p-3 rounded mb-4">

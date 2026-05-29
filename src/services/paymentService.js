@@ -11,7 +11,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
  * @param {Object} options - { amount, customerName, customerEmail, customerPhone, userId, items, address }
  * @returns {Promise} - Resolves with the payment confirmation or rejects with error
  */
-export const initiatePayment = async ({ amount, customerName, customerEmail, customerPhone, userId, items, address }) => {
+export const initiatePayment = async ({ amount, customerName, customerEmail, customerPhone, userId, items, address, couponCode }) => {
   // 1. Create Order on our Flask Backend
   const orderResponse = await fetch(`${BACKEND_URL}/create-order`, {
     method: 'POST',
@@ -21,7 +21,8 @@ export const initiatePayment = async ({ amount, customerName, customerEmail, cus
         currency: 'INR',
         userId,
         items,
-        address
+        address,
+        couponCode
     }),
   });
 
