@@ -1,6 +1,7 @@
 import './App.css'
 import Navbar from './Components/Navbar'
 import Footer from './Components/Footer'
+import PolicyBanner from './Components/PolicyBanner'
 import { Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 
@@ -45,6 +46,8 @@ const ProductOverview = lazyWithRetry(() => import('./Pages/ProductOverview'))
 const ProductDetail = lazyWithRetry(() => import('./Pages/ProductDetail'))
 const OrderSuccess = lazyWithRetry(() => import('./Pages/OrderSuccess'))
 const EthicalConsent = lazyWithRetry(() => import('./Pages/EthicalConsent'))
+const PrivacyPolicy = lazyWithRetry(() => import('./Pages/PrivacyPolicy'))
+const TermsOfUse = lazyWithRetry(() => import('./Pages/TermsOfUse'))
 const NotFound = lazyWithRetry(() => import('./Pages/NotFound'))
 
 // Loading component for Suspense
@@ -62,6 +65,7 @@ function App() {
     <div className='min-h-screen bg-linear-to-b from-black via-[#A0521A] to-black'
   >
     <Navbar />
+    <PolicyBanner />
     <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route path="/" element={<Home />} />
@@ -86,6 +90,8 @@ function App() {
       <Route path="/settings" element={<Settings />} />
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/ethical-consent" element={<EthicalConsent />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-use" element={<TermsOfUse />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
     </Suspense>
