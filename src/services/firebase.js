@@ -27,6 +27,7 @@ if (!firebaseConfig.projectId) {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+console.log("Firebase config loaded:", firebaseConfig);
 
 // Initialize services
 export const analytics = await isSupported() ? getAnalytics(app) : null;

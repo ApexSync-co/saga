@@ -21,16 +21,8 @@ const Pendant = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Pendants...</div>
-      </div>
-    );
-  }
-
   return (
-    <ProductPageLayout title="Pendants" products={products} />
+    <ProductPageLayout title="Pendants" products={products} isLoading={loading} />
   );
 };
 

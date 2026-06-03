@@ -42,9 +42,8 @@ export default function Cart() {
 
     const total = getCartTotal();
     const deliveryCharge = 50;
-    const platformFee = 20;
     const discount = appliedCoupon ? appliedCoupon.discount : 0;
-    const finalTotal = Math.max(0, total + deliveryCharge + platformFee - discount);
+    const finalTotal = Math.max(0, total + deliveryCharge - discount);
 
     useEffect(() => {
         if (appliedCoupon) {
@@ -611,10 +610,7 @@ export default function Cart() {
                                      <span>Delivery Charge</span>
                                      <span className="text-white">₹{deliveryCharge}</span>
                                  </div>
-                                 <div className="flex justify-between text-zinc-400">
-                                     <span>Platform Fee</span>
-                                     <span className="text-white">₹{platformFee}</span>
-                                 </div>
+
                                  {appliedCoupon && (
                                      <div className="flex justify-between text-green-400">
                                          <span>Discount ({appliedCoupon.code})</span>

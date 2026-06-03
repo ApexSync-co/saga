@@ -21,16 +21,8 @@ const Bracelets = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Bracelets...</div>
-      </div>
-    );
-  }
-
   return (
-    <ProductPageLayout title="Bracelets" products={products} />
+    <ProductPageLayout title="Bracelets" products={products} isLoading={loading} />
   );
 };
 

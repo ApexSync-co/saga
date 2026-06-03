@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import ProductPageLayout from '../Components/ProductPageLayout';
 import { fetchProductsByCategory } from '../services/products';
 
-const Bangles = () => {
+const Anklets = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await fetchProductsByCategory('Bangles');
+        const data = await fetchProductsByCategory('Anklets');
         setProducts(data);
       } catch (error) {
-        console.error("Error fetching bangles:", error);
+        console.error("Error fetching anklets:", error);
       } finally {
         setLoading(false);
       }
@@ -21,19 +21,11 @@ const Bangles = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Bangles...</div>
-      </div>
-    );
-  }
-
   return (
     <>
-      <ProductPageLayout title="Bangles" products={products} />
+      <ProductPageLayout title="Anklets" products={products} isLoading={loading} />
     </>
   );
 };
 
-export default Bangles;
+export default Anklets;

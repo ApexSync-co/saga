@@ -14,7 +14,7 @@ const DEMO_ORDERS = [
         awbNumber: 'V012345678',
         paymentId: 'PAY-8899',
         address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
-        items: [{ name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' }],
+        items: [{ name: 'Gold Anklets', quantity: 2, image: '/bangles.jpg' }],
         mockTracking: {
             status: 'In Transit',
             currentLocation: 'Mumbai Hub',
@@ -172,28 +172,8 @@ const MyOrders = () => {
             return;
         }
 
-        setTrackingLoading(true);
-        setIsDemoTracking(false);
-        try {
-            const data = await trackOrder(awb);
-            setTrackingData({
-                ...data,
-                id: order.id,
-                items: order.items
-            });
-        } catch (error) {
-            console.error("Tracking error:", error);
-            // Fallback to demo or error state if needed
-            setTrackingData({
-                id: order.id,
-                status: 'AWB Not Found',
-                location: 'Processing',
-                history: [],
-                items: order.items
-            });
-        } finally {
-            setTrackingLoading(false);
-        }
+        // Open Aftership directly
+        window.open(`https://www.aftership.com/track/dtdc/${awb}`, '_blank');
     };
 
     if (loading) {

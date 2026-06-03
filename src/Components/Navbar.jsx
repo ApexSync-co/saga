@@ -155,7 +155,7 @@ function Navbar(){
                         </Link>
                         <div className="pl-[72px] flex flex-col gap-[9px] mt-1 pb-1.5">
                              <Link to="/necklaces" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Necklaces</Link>
-                             <Link to="/bangles" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Bangles</Link>
+                             <Link to="/anklets" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Anklets</Link>
                              <Link to="/earrings" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Earrings</Link>
                              <Link to="/pendants" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Pendants</Link>
                              <Link to="/rings" onClick={() => setIsOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors uppercase tracking-wider">Rings</Link>

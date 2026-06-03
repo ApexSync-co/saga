@@ -21,16 +21,8 @@ const Necklace = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Necklaces...</div>
-      </div>
-    );
-  }
-
   return (
-    <ProductPageLayout title="Necklaces" products={products} />
+    <ProductPageLayout title="Necklaces" products={products} isLoading={loading} />
   );
 };
 
