@@ -172,28 +172,8 @@ const MyOrders = () => {
             return;
         }
 
-        setTrackingLoading(true);
-        setIsDemoTracking(false);
-        try {
-            const data = await trackOrder(awb);
-            setTrackingData({
-                ...data,
-                id: order.id,
-                items: order.items
-            });
-        } catch (error) {
-            console.error("Tracking error:", error);
-            // Fallback to demo or error state if needed
-            setTrackingData({
-                id: order.id,
-                status: 'AWB Not Found',
-                location: 'Processing',
-                history: [],
-                items: order.items
-            });
-        } finally {
-            setTrackingLoading(false);
-        }
+        // Open Aftership directly
+        window.open(`https://www.aftership.com/track/dtdc/${awb}`, '_blank');
     };
 
     if (loading) {

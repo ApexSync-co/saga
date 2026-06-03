@@ -55,7 +55,10 @@ const TrackingDisplay = ({ trackingData, onClose }) => {
                     <div className='flex justify-between items-center px-6 py-5 border-b border-white/5 bg-[#0a0a0a] shrink-0'>
                         <div className='space-y-0.5'>
                             <h2 className='text-2xl font-light font-Great_Vibes text-white tracking-widest'>Track Acquisition</h2>
-                            <p className='text-[8px] uppercase tracking-[0.5em] text-white/20 font-mono'>Ref: {trackingData.id ? trackingData.id.slice(0, 14).toUpperCase() : ''}</p>
+                            <div className='flex items-center gap-4 mt-1'>
+                                <p className='text-[8px] uppercase tracking-[0.5em] text-white/20 font-mono'>Ref: {trackingData.id ? trackingData.id.slice(0, 12).toUpperCase() : ''}</p>
+                                {trackingData.awbNumber && <p className='text-[8px] uppercase tracking-[0.5em] text-primary/80 font-mono'>AWB: {trackingData.awbNumber}</p>}
+                            </div>
                         </div>
                         <button 
                             onClick={() => { setIsVisible(false); setTimeout(onClose, 500); }}
