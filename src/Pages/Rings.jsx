@@ -21,16 +21,8 @@ const Rings = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Rings...</div>
-      </div>
-    );
-  }
-
   return (
-    <ProductPageLayout title="Rings" products={products} />
+    <ProductPageLayout title="Rings" products={products} isLoading={loading} />
   );
 };
 

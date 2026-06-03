@@ -4,8 +4,9 @@ import { useCart } from '../Context/CartContext';
 import CircularHorizontalScroll from './CircularHorizontalScroll';
 import { fetchFestiveEdit } from '../services/products';
 
-const ProductPageLayout = ({ title, products }) => {
+const ProductPageLayout = ({ title, products, isLoading }) => {
   const [config, setConfig] = useState(null);
+  const [isConfigLoading, setIsConfigLoading] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
   const [showBlur, setShowBlur] = useState(false);
@@ -24,9 +25,12 @@ const ProductPageLayout = ({ title, products }) => {
         });
         setConfig(metadataMap);
       }
+      setIsConfigLoading(false);
     };
     loadConfig();
   }, []);
+
+  const fullyLoading = isLoading || isConfigLoading;
 
   const sortedProducts = [...products].sort((a, b) => {
       if (sortOption === 'Price: Low to High') {
@@ -86,31 +90,43 @@ const ProductPageLayout = ({ title, products }) => {
 
       <div className="relative h-[35vh] md:h-[65vh] -mt-4 md:-mt-8 mb-12 md:mb-16 flex items-center justify-center overflow-hidden w-full animate-fade-in">
         {/* Hero Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={config?.[title]?.image || '/stock1.jpeg'} 
-            alt="" 
-            className="w-full h-full object-cover scale-110 md:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black/95"></div>
-        </div>
+        {fullyLoading ? (
+          <div className="absolute inset-0 z-0 bg-zinc-900 animate-pulse"></div>
+        ) : (
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={config?.[title]?.image || '/stock1.jpeg'} 
+              alt="" 
+              className="w-full h-full object-cover scale-110 md:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black/95"></div>
+          </div>
+        )}
 
         {/* Content */}
-        <div className="relative z-10 text-center px-6">
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 md:mb-6 opacity-80">
-            <span className="w-8 md:w-12 h-[1px] bg-primary"></span>
-            <span className="text-zinc-300 text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-[0.4em] font-medium whitespace-nowrap">Saga Collection</span>
-            <span className="w-8 md:w-12 h-[1px] bg-primary"></span>
+        {fullyLoading ? (
+          <div className="relative z-10 flex flex-col items-center justify-center h-full space-y-4 md:space-y-6 px-6 w-full">
+            <div className="w-48 md:w-64 h-2 bg-zinc-800 rounded animate-pulse"></div>
+            <div className="w-64 md:w-96 h-12 md:h-24 bg-zinc-800 rounded animate-pulse"></div>
+            <div className="w-32 md:w-48 h-3 bg-zinc-800 rounded animate-pulse"></div>
           </div>
-          
-          <h1 className="text-white font-Great_Vibes text-5xl md:text-9xl mb-2 md:mb-4 tracking-wider drop-shadow-2xl">
-            {title}
-          </h1>
-          
-          <p className="text-zinc-300 text-[10px] md:text-lg font-Poppins tracking-[0.15em] md:tracking-[0.2em] uppercase opacity-70 max-w-[250px] md:max-w-none mx-auto">
-            {config?.[title]?.subtitle || 'Curated pieces of elegance'}
-          </p>
-        </div>
+        ) : (
+          <div className="relative z-10 text-center px-6">
+            <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 md:mb-6 opacity-80">
+              <span className="w-8 md:w-12 h-[1px] bg-primary"></span>
+              <span className="text-zinc-300 text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-[0.4em] font-medium whitespace-nowrap">Saga Collection</span>
+              <span className="w-8 md:w-12 h-[1px] bg-primary"></span>
+            </div>
+            
+            <h1 className="text-white font-Great_Vibes text-5xl md:text-9xl mb-2 md:mb-4 tracking-wider drop-shadow-2xl">
+              {title}
+            </h1>
+            
+            <p className="text-zinc-300 text-[10px] md:text-lg font-Poppins tracking-[0.15em] md:tracking-[0.2em] uppercase opacity-70 max-w-[250px] md:max-w-none mx-auto">
+              {config?.[title]?.subtitle || 'Curated pieces of elegance'}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="px-4">
@@ -131,7 +147,24 @@ const ProductPageLayout = ({ title, products }) => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto">
-          {sortedProducts.length === 0 ? (
+          {fullyLoading ? (
+            [...Array(4)].map((_, idx) => (
+              <div 
+                key={idx} 
+                className="group relative flex flex-col md:flex-row h-auto md:h-96 transition-all duration-700 bg-[#111] rounded-xl md:rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl animate-pulse"
+              >
+                <div className="w-full md:w-[60%] h-48 sm:h-64 md:h-full relative overflow-hidden bg-zinc-800/50"></div>
+                <div className="w-full md:w-[40%] p-4 md:p-10 flex flex-col justify-between bg-gradient-to-br from-[#111] to-[#000]">
+                  <div className="space-y-4">
+                    <div className="w-20 h-2 bg-zinc-800/80 rounded mx-auto md:mx-0"></div>
+                    <div className="w-full h-6 bg-zinc-800 rounded"></div>
+                    <div className="w-1/2 h-6 bg-zinc-800 rounded mx-auto md:mx-0"></div>
+                  </div>
+                  <div className="mt-8 w-full h-10 bg-zinc-800/80 rounded-lg"></div>
+                </div>
+              </div>
+            ))
+          ) : sortedProducts.length === 0 ? (
             <div className="col-span-full py-24 px-8 text-center max-w-xl mx-auto bg-black/40 border border-white/10 rounded-[2rem] backdrop-blur-xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] flex flex-col items-center relative overflow-hidden animate-fade-in">
               {/* Subtle top gold accent bar */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />

@@ -21,16 +21,8 @@ const Sets = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Sets...</div>
-      </div>
-    );
-  }
-
   return (
-    <ProductPageLayout title="Sets" products={products} />
+    <ProductPageLayout title="Sets" products={products} isLoading={loading} />
   );
 };
 

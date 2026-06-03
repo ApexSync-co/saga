@@ -21,16 +21,8 @@ const Earrings = () => {
     loadProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black pt-32 flex justify-center">
-        <div className="text-white text-xl">Loading Earrings...</div>
-      </div>
-    );
-  }
-
   return (
-    <ProductPageLayout title="Earrings" products={products} />
+    <ProductPageLayout title="Earrings" products={products} isLoading={loading} />
   );
 };
 
