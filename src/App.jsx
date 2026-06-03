@@ -25,7 +25,7 @@ const lazyWithRetry = (componentImport) =>
   });
 
 const Home = lazyWithRetry(() => import('./Pages/Home'))
-const Bangles = lazyWithRetry(() => import('./Pages/Bangles'))
+const Anklets = lazyWithRetry(() => import('./Pages/Anklets'))
 const Bracelets = lazyWithRetry(() => import('./Pages/Bracelets'))
 const Earrings = lazyWithRetry(() => import('./Pages/Earrings'))
 const Necklace = lazyWithRetry(() => import('./Pages/Necklace'))
@@ -71,7 +71,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/products" element={<ProductOverview />} />
       <Route path="/product/:productId" element={<ProductDetail />} />
-      <Route path="/bangles" element={<Bangles />} />
+      <Route path="/anklets" element={<Anklets />} />
       <Route path="/bracelets" element={<Bracelets />} />
       <Route path="/earrings" element={<Earrings />} />
       <Route path="/necklaces" element={<Necklace />} />

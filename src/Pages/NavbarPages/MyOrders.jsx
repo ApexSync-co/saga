@@ -14,7 +14,7 @@ const DEMO_ORDERS = [
         awbNumber: 'V012345678',
         paymentId: 'PAY-8899',
         address: { street: '123 Marine Drive', city: 'Mumbai', zip: '400001' },
-        items: [{ name: 'Gold Bangles', quantity: 2, image: '/bangles.jpg' }],
+        items: [{ name: 'Gold Anklets', quantity: 2, image: '/bangles.jpg' }],
         mockTracking: {
             status: 'In Transit',
             currentLocation: 'Mumbai Hub',

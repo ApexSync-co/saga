@@ -73,7 +73,7 @@ const ProductOverview = () => {
       <div className="max-w-7xl mx-auto mb-8 px-4 flex flex-col md:flex-row justify-between items-center gap-6">
         {/* Filter Scrollable Tabs */}
         <div className="flex overflow-x-auto w-full md:w-auto no-scrollbar gap-2 pb-2 md:pb-0">
-          {['All', 'Bangles', 'Bracelets', 'Earrings', 'Necklaces', 'Pendants', 'Rings', 'Sets'].map(cat => (
+          {['All', 'Anklets', 'Bracelets', 'Earrings', 'Necklaces', 'Pendants', 'Rings', 'Sets'].map(cat => (
              <button 
                 key={cat}
                 onClick={() => setFilterCategory(cat)}

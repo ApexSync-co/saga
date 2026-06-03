@@ -21,7 +21,7 @@ function Footer() {
                         <Link to="/" className="hover:text-white transition-colors duration-300">Home</Link>
                         <Link to="/products" className="hover:text-white transition-colors duration-300">Shop</Link>
                         <Link to="/necklaces" className="hover:text-white transition-colors duration-300">Necklaces</Link>
-                        <Link to="/bangles" className="hover:text-white transition-colors duration-300">Bangles</Link>
+                        <Link to="/anklets" className="hover:text-white transition-colors duration-300">Anklets</Link>
                         <Link to="/earrings" className="hover:text-white transition-colors duration-300">Earrings</Link>
                         <Link to="/pendants" className="hover:text-white transition-colors duration-300">Pendants</Link>
                         <Link to="/rings" className="hover:text-white transition-colors duration-300">Rings</Link>

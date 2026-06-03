@@ -74,7 +74,7 @@ export async function fetchAllProducts() {
 
 /**
  * Fetch products by category
- * @param {string} category - e.g., 'Bangle', 'Bracelet', 'Earring', 'Necklace', 'Pendant', 'Ring'
+ * @param {string} category - e.g., 'Anklet', 'Bracelet', 'Earring', 'Necklace', 'Pendant', 'Ring'
  */
 export async function fetchProductsByCategory(category) {
   try {
@@ -197,7 +197,7 @@ export async function fetchFestiveEdit() {
       { id: 'sets', name: 'Sets', image: '/Sets.jpg', subtitle: 'Complete heritage ensembles' },
       { id: 'necklaces', name: 'Necklaces', image: '/Necklace.jpeg', subtitle: 'Majestic neckpieces' },
       { id: 'earrings', name: 'Earrings', image: '/stock3.jpeg', subtitle: 'Radiance for your ears' },
-      { id: 'bangles', name: 'Bangles', image: '/Bangles.png', subtitle: 'Exquisite wrist adornments' },
+      { id: 'anklets', name: 'Anklets', image: '/Bangles.png', subtitle: 'Exquisite ankle adornments' },
       { id: 'bracelets', name: 'Bracelets', image: '/Bracelets.jpeg', subtitle: 'Elegant modern classics' },
       { id: 'pendants', name: 'Pendants', image: '/Pendant.jpeg', subtitle: 'Heartfelt brilliance' },
       { id: 'rings', name: 'Rings', image: '/Rings.jpeg', subtitle: 'Symbols of eternity' },

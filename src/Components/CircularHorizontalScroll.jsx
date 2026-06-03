@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Static category data — these are the fixed categories in the store
 const CATEGORIES = [
-  { id: 'bangles', name: 'Bangles', handle: 'bangles', image: '/Bangles.png' },
+  { id: 'anklets', name: 'Anklets', handle: 'anklets', image: '/Bangles.png' },
   { id: 'bracelets', name: 'Bracelets', handle: 'bracelets', image: '/Bracelets.jpeg' },
   { id: 'earrings', name: 'Earrings', handle: 'earrings', image: '/stock3.jpeg' },
   { id: 'necklaces', name: 'Necklaces', handle: 'necklaces', image: '/Necklace.jpeg' },
