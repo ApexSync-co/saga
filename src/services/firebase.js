@@ -20,6 +20,11 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
+// Debug: Check if Firebase config is loaded correctly
+if (!firebaseConfig.projectId) {
+  console.error("Firebase Project ID is missing. Please ensure your .env file is correctly configured with VITE_FIREBASE_PROJECT_ID.");
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
