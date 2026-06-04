@@ -2,14 +2,19 @@ import React from 'react';
 
 const Help = () => {
     return (
-        <div className="pt-24 min-h-screen w-full text-white container mx-auto px-4 md:px-10 mb-10">
-            <h1 className="text-3xl font-bold mb-8 text-primary border-b-2 border-primary pb-2 inline-block">Help & Support</h1>
+        <div 
+            className="pt-24 min-h-screen w-full text-white container mx-auto px-4 md:px-10 mb-10"
+            style={{
+                background: 'linear-gradient(135deg, rgba(15,23,42,0.3) 0%, rgba(20,30,48,0.2) 100%)'
+            }}
+        >
+            <h1 className="text-4xl md:text-5xl font-bold mb-8 text-primary border-b-3 border-gradient-to-r from-primary to-transparent pb-4 inline-block tracking-tight">Help & Support</h1>
 
             <div className="grid md:grid-cols-2 gap-10">
                 <div>
-                    <h2 className="text-2xl font-bold mb-6 text-white">Frequently Asked Questions</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white tracking-wide">Frequently Asked Questions</h2>
                     <div className="space-y-4">
-                        <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
+                        <details className="group bg-slate-900/40 backdrop-blur-md p-4 rounded-lg border border-primary/30 cursor-pointer open:border-primary/80 open:bg-slate-900/60 transition-all duration-300">
                             <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
                                 How can I track my order?
                                 <span className="transition group-open:rotate-180 group-open:text-primary">
@@ -20,7 +25,7 @@ const Help = () => {
                                 You can track your order by visiting the "My Orders" section in your account. Click on the specific order to see real-time updates.
                             </p>
                         </details>
-                        <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
+                        <details className="group bg-slate-900/40 backdrop-blur-md p-4 rounded-lg border border-primary/30 cursor-pointer open:border-primary/80 open:bg-slate-900/60 transition-all duration-300">
                             <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
                                 What is the return policy?
                                 <span className="transition group-open:rotate-180 group-open:text-primary">
@@ -31,7 +36,7 @@ const Help = () => {
                                 We do not have a return policy. All sales are final, and we do not accept returns or replacements.
                             </p>
                         </details>
-                        <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
+                        <details className="group bg-slate-900/40 backdrop-blur-md p-4 rounded-lg border border-primary/30 cursor-pointer open:border-primary/80 open:bg-slate-900/60 transition-all duration-300">
                             <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
                                 Do you ship internationally or to other states?
                                 <span className="transition group-open:rotate-180 group-open:text-primary">
@@ -42,7 +47,7 @@ const Help = () => {
                                 Currently, we deliver only within Kerala state. We do not ship to other states or international locations at this moment.
                             </p>
                         </details>
-                        <details className="group bg-black p-4 rounded-lg border border-white cursor-pointer open:border-primary">
+                        <details className="group bg-slate-900/40 backdrop-blur-md p-4 rounded-lg border border-primary/30 cursor-pointer open:border-primary/80 open:bg-slate-900/60 transition-all duration-300">
                             <summary className="flex justify-between items-center font-medium text-white list-none hover:text-primary transition-colors">
                                 Do you support Cash on Delivery (COD)?
                                 <span className="transition group-open:rotate-180 group-open:text-primary">
@@ -58,8 +63,8 @@ const Help = () => {
                 </div>
 
                 <div>
-                    <h2 className="text-2xl font-bold mb-6 text-white">Contact Us</h2>
-                    <div className="bg-black p-8 rounded-lg border border-primary">
+                    <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white tracking-wide">Contact Us</h2>
+                    <div className="bg-slate-900/40 backdrop-blur-md p-8 rounded-lg border border-primary/40 transition-all duration-300 hover:border-primary/70">
                         <p className="mb-6 text-white/80">Need more assistance? Reach out to our customer support team.</p>
                         
                         <div className="flex items-center gap-4 mb-6">
