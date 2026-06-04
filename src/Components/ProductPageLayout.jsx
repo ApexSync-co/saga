@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../Context/CartContext';
 import CircularHorizontalScroll from './CircularHorizontalScroll';
 import { fetchFestiveEdit } from '../services/products';
+import Breadcrumbs from './Breadcrumbs';
 
 const ProductPageLayout = ({ title, products, isLoading }) => {
   const [config, setConfig] = useState(null);
@@ -74,17 +75,19 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
     return () => clearTimeout(timer);
   }, [hoveredId, isScrolling]);
 
+  // Dynamic path generator mapping current layout context down to the component
+  const breadcrumbPaths = [
+    { name: title, url: '' } // Last entry reflects active category, url left blank
+  ];
+
   return (
     <div className="pt-28 pb-20 min-h-screen selection:bg-primary/30">
       <div className="px-4">
         <CircularHorizontalScroll />
         
         <div className="max-w-7xl mx-auto mb-12">
-          <div className="flex items-center space-x-2 text-zinc-500 text-xs font-medium tracking-widest uppercase">
-            <Link to="/" className="hover:text-primary transition-colors duration-300">Home</Link>
-            <span className="text-zinc-700">/</span>
-            <span className="text-zinc-300">{title}</span>
-          </div>
+          {/* Implemented custom Breadcrumbs component over static text string */}
+          <Breadcrumbs paths={breadcrumbPaths} />
         </div>
       </div>
 
@@ -134,9 +137,9 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
           <div className="flex items-center gap-3">
               <span className="text-zinc-400 text-sm font-medium tracking-wide">Sort:</span>
               <select 
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                  className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
               >
                   <option value="Featured">Featured</option>
                   <option value="Price: Low to High">Price: Low to High</option>
@@ -166,19 +169,15 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
             ))
           ) : sortedProducts.length === 0 ? (
             <div className="col-span-full py-24 px-8 text-center max-w-xl mx-auto bg-black/40 border border-white/10 rounded-[2rem] backdrop-blur-xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] flex flex-col items-center relative overflow-hidden animate-fade-in">
-              {/* Subtle top gold accent bar */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
               
-              {/* Elegant Glowing Icon */}
               <div className="relative w-20 h-20 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center mb-8">
-                {/* Outer pulsing ring */}
                 <div className="absolute inset-0 rounded-full border border-primary/20 animate-ping opacity-25" />
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-10 h-10 text-primary">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5h-1.875a6 6 0 0 0-11.25 0H6.125m15.75 0A3 3 0 0 1 22 10.5v8.25A3 3 0 0 1 19 21.75H5a3 3 0 0 1-3-3.25V10.5a3 3 0 0 1 2.125-2.875m15.75 0V6a6 6 0 0 0-12 0v1.5m12 0a2.25 2.25 0 0 0-2.25-2.25h-7.5A2.25 2.25 0 0 0 6.125 7.5" />
                 </svg>
               </div>
               
-              {/* Premium Typography */}
               <h3 className="text-white font-Great_Vibes text-5xl mb-4 tracking-wider">
                 Curating New Brilliance
               </h3>
@@ -187,7 +186,6 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
                 Our master artisans are currently crafting new signature designs for this collection. Please explore our other signature categories.
               </p>
 
-              {/* Sleek Glass Button */}
               <button 
                 onClick={() => navigate('/products')}
                 className="group/btn relative px-8 py-3.5 bg-transparent text-white border border-primary/30 hover:border-primary text-[10px] tracking-[0.2em] uppercase font-bold transition-all duration-500 rounded-full overflow-hidden cursor-pointer shadow-[0_0_15px_rgba(251,112,16,0.05)] hover:shadow-[0_0_25px_rgba(251,112,16,0.2)]"
@@ -218,19 +216,23 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
                     className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
                   />
                   
-                  {/* Radial Overlay */}
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
                   
-                  {/* Stock Status Badges */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  {/* Stock Status Badges - Reworked Premium Borderless Design */}
+                  {/* Stock Status Badges - Reworked Premium Design */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-20 pointer-events-none">
                     {item.stock <= 5 && item.stock > 0 ? (
-                      <span className="text-orange-400 text-[10px] font-bold tracking-widest uppercase bg-orange-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-500/30 w-fit">
-                        Low Stock
-                      </span>
+                      <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-md shadow-lg">
+                        <span className="bg-gradient-to-r from-amber-200 to-amber-500 bg-clip-text text-transparent text-[9px] font-Poppins font-bold tracking-[0.2em] uppercase">
+                          Limited Stock
+                        </span>
+                      </div>
                     ) : item.stock === 0 ? (
-                      <span className="text-red-400 text-[10px] font-bold tracking-widest uppercase bg-red-950/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-red-500/30 w-fit">
-                        Out of Stock
-                      </span>
+                      <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-md shadow-lg">
+                        <span className="bg-gradient-to-r from-zinc-400 to-zinc-600 bg-clip-text text-transparent text-[9px] font-Poppins font-bold tracking-[0.2em] uppercase">
+                          Out of Stock
+                        </span>
+                      </div>
                     ) : null}
                   </div>
                 </div>
@@ -251,7 +253,6 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
 
                      <p className="font-Poppins text-[12px] md:text-2xl text-center tracking-tight text-white mb-2">{item.price}</p>
                      
-                     {/* Minimalistic Star + Number Rating - Larger Stars */}
                      <div className="flex justify-center items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity duration-700">
                         <div className="flex gap-1">
                           {[...Array(5)].map((_, i) => (

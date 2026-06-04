@@ -24,7 +24,7 @@ function CircularHorizontalScroll() {
 
 
   return (
-    <div className="md:py-10 relative group/scroll w-full">
+    <div className="relative group/scroll w-full pt-0 pb-4 md:pb-6 -mt-5 md:-mt-12">
 
 
       <div
