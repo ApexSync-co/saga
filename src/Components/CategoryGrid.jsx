@@ -45,9 +45,9 @@ export default function CategoryGrid(){
                 }
 
                 // Dynamic font and uppercase handling based on whether it is the sets collection
-                const fontClass = cat.isSets 
-                    ? "font-Great_Vibes normal-case tracking-wide text-3xl md:text-6xl" 
-                    : "font-Poppins uppercase tracking-widest";
+                // const fontClass = cat.isSets 
+                //     ? "font-Great_Vibes normal-case tracking-wide text-3xl md:text-6xl" 
+                //     : "font-Poppins uppercase tracking-widest";
 
                 return (
                     <div 
@@ -70,9 +70,9 @@ export default function CategoryGrid(){
                         </div>
                         
                         {/* Overlay Gradient & Text */}
-                        <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col ${index === 0 ? 'justify-center items-center' : 'justify-end'} p-6 md:p-8`}>
-                            {index !== 0 && <span className="text-primary text-[10px] md:text-xs uppercase tracking-[0.3em] font-bold mb-1 md:mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">Explore</span>}
-                            <h1 className={`${fontClass} ${index === 0 ? 'text-2xl md:text-5xl font-medium text-white text-center' : 'text-lg md:text-2xl font-medium text-white'} transition-colors`}>
+                        <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col ${index === 0 ? 'justify-center items-center' : 'justify-end'} p-6 md:p-8`}>
+                            {index !== 0 && <span className="text-primary text-[10px] md:text-xs uppercase tracking-[0.3em] mb-1 md:mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">Explore</span>}
+                            <h1 className={`font-Great_Vibes normal-case tracking-wide text-3xl md:text-4xl ${index === 0 ? 'text-2xl md:text-5xl font-medium text-white text-center' : 'text-lg md:text-2xl font-medium text-white'} transition-colors`}>
                                 {cat.title}
                             </h1>
                             {index === 0 && (

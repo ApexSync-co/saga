@@ -46,7 +46,8 @@ function Navbar() {
    return (
       <>
          {/* Top Navigation Bar with customized deep background tone */}
-         <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 transition-transform duration-300 bg-[#0a0502]/80 backdrop-blur-sm shadow-lg border-b border-primary/20 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} >
+         {/* <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 transition-transform duration-300 bg-[#0a0502]/80 backdrop-blur-sm shadow-lg border-b border-primary/20 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} > */}
+         <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 transition-transform duration-300 bg-[#0a0502] shadow-lg border-b border-primary/20 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} >
             <ul className="flex gap-10 mx-10 max-w-fit relative z-50">
                <button 
                   className="flex flex-col justify-center items-center w-8 h-8 gap-1.5 overflow-hidden hover:opacity-70 transition-opacity" 

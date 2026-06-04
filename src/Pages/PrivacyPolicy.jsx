@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
             <div className="max-w-4xl mx-auto px-6 lg:px-8">
                 {/* Header Section */}
                 <div className="text-center mb-20 animate-fade-in">
-                    <h1 className="text-6xl md:text-7xl font-medium tracking-wider text-primary font-Great_Vibes mb-2">
+                    <h1 className="text-6xl md:text-7xl tracking-wider text-primary font-Great_Vibes mb-2">
                         Privacy Policy
                     </h1>
                     <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mb-6"></div>

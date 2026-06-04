@@ -14,7 +14,7 @@ export default function Breadcrumbs({ paths = [] }) {
                     
                     return (
                         <React.Fragment key={index}>
-                            <span className="text-gray-600 text-[10px] md:text-xs">/</span>
+                            <span className="text-gray-600 text-[10px] md:text-xs">•</span>
                             <li>
                                 {isLast ? (
                                     // The current page is highlighted and not a link

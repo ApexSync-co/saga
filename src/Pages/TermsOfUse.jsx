@@ -21,7 +21,7 @@ export default function TermsOfUse() {
                     {/* Section 01 */}
                     <section className="group relative bg-[#0a0a0a] border-l-2 border-primary/40 hover:border-primary p-8 md:p-10 rounded-r-2xl transition-all duration-500 shadow-xl hover:shadow-primary/[0.02]">
                         <h2 className="text-lg md:text-xl font-medium text-white mb-4 tracking-wide flex items-center gap-3">
-                            <span className="text-primary font-mono text-sm tracking-normal">01.</span> 
+                            <span className="text-primary font-Poppins text-sm tracking-normal">01.</span> 
                             Agreement to Terms
                         </h2>
                         <p className="text-zinc-400 font-light leading-relaxed">
