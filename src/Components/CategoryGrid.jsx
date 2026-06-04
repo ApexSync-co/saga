@@ -14,6 +14,7 @@ export default function CategoryGrid(){
                 const mapped = data.categories.map(cat => ({
                     handle: cat.id,
                     title: cat.id === 'sets' ? 'The Sets Collection' : cat.name,
+                    isSets: cat.id === 'sets', // Flag added here to identify the sets collection
                     image: cat.image,
                     position: cat.position || 'center',
                     fit: cat.fit || 'cover',
@@ -43,6 +44,11 @@ export default function CategoryGrid(){
                     spanClass = "col-span-1 md:col-span-1"; // Quarter width
                 }
 
+                // Dynamic font and uppercase handling based on whether it is the sets collection
+                const fontClass = cat.isSets 
+                    ? "font-Great_Vibes normal-case tracking-wide text-3xl md:text-6xl" 
+                    : "font-Poppins uppercase tracking-widest";
+
                 return (
                     <div 
                         key={cat.handle} 
@@ -66,7 +72,7 @@ export default function CategoryGrid(){
                         {/* Overlay Gradient & Text */}
                         <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col ${index === 0 ? 'justify-center items-center' : 'justify-end'} p-6 md:p-8`}>
                             {index !== 0 && <span className="text-primary text-[10px] md:text-xs uppercase tracking-[0.3em] font-bold mb-1 md:mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">Explore</span>}
-                            <h1 className={`${index === 0 ? 'font-Poppins text-2xl md:text-5xl uppercase tracking-widest font-medium text-white text-center' : 'font-Poppins text-lg md:text-2xl uppercase tracking-widest font-medium text-white'} transition-colors`}>
+                            <h1 className={`${fontClass} ${index === 0 ? 'text-2xl md:text-5xl font-medium text-white text-center' : 'text-lg md:text-2xl font-medium text-white'} transition-colors`}>
                                 {cat.title}
                             </h1>
                             {index === 0 && (
