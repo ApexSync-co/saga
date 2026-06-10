@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 // Static category data — these are the fixed categories in the store
 const CATEGORIES = [
-  { id: 'anklets', name: 'Anklets', handle: 'anklets', image: '/Bangles.png' },
+  { id: 'anklets', name: 'Anklets', handle: 'anklets', image: '/anklets.jpeg' },
   { id: 'bracelets', name: 'Bracelets', handle: 'bracelets', image: '/Bracelets.jpeg' },
   { id: 'earrings', name: 'Earrings', handle: 'earrings', image: '/stock3.jpeg' },
   { id: 'necklaces', name: 'Necklaces', handle: 'necklaces', image: '/Necklace.jpeg' },
   { id: 'pendants', name: 'Pendants', handle: 'pendants', image: '/Pendant.jpeg' },
   { id: 'rings', name: 'Rings', handle: 'rings', image: '/Rings.jpeg' },
-  { id: 'sets', name: 'Sets', handle: 'sets', image: '/Sets.jpg' },
+  { id: 'sets', name: 'Sets', handle: 'sets', image: '/sets.jpeg' },
 ];
 
 function CircularHorizontalScroll() {
