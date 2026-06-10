@@ -147,9 +147,7 @@ export default function ImageLayout(){
             {/* Banner Section */}
             <div className="mt-4 md:mt-12 relative h-[25vh] md:h-[45vh] rounded-4xl md:rounded-[2.5rem] overflow-hidden group cursor-pointer mx-4 md:mx-0">
                 {/* <div className="absolute inset-0 bg-black/30 md:bg-black/30 md:group-hover:bg-black/10 transition-colors duration-700 z-10" /> */}
-                <h2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center text-5xl md:text-8xl font-Great_Vibes z-20 md:group-hover:scale-105 transition-transform duration-700 pointer-events-none w-full px-4">
-                    Traditional Coming Soon
-                </h2> 
+
                 <img 
                     src={content.banner.src} 
                     alt={content.banner.alt} 
