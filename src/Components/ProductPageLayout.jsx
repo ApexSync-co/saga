@@ -11,6 +11,7 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
   const [showBlur, setShowBlur] = useState(false);
+  const [filterOption, setFilterOption] = useState('All');
   const [sortOption, setSortOption] = useState('Featured');
   const { addToCart } = useCart();
   const navigate = useNavigate();
@@ -33,7 +34,13 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
 
   const fullyLoading = isLoading || isConfigLoading;
 
-  const sortedProducts = [...products].sort((a, b) => {
+  const filteredProducts = products.filter(product => {
+      if (filterOption === 'All') return true;
+      const searchStr = `${product.name} ${product.description} ${product.metalColor || ''} ${product.material || ''}`.toLowerCase();
+      return searchStr.includes(filterOption.toLowerCase());
+  });
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
       if (sortOption === 'Price: Low to High') {
           return parseInt(a.price.replace(/[^0-9]/g, '')) - parseInt(b.price.replace(/[^0-9]/g, ''));
       }
@@ -134,9 +141,30 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
 
       <div className="px-4">
         <div className="max-w-7xl mx-auto mb-10 flex justify-end">
-          <div className="flex items-center gap-3">
-              <span className="text-zinc-400 text-sm font-medium tracking-wide">Sort:</span>
-              <select 
+          <div className="flex items-center gap-6">
+              {title === 'Earrings' && (
+                <div className="flex items-center gap-3">
+                    <span className="text-zinc-400 text-sm font-medium tracking-wide">Type:</span>
+                    <select 
+                      value={filterOption}
+                      onChange={(e) => setFilterOption(e.target.value)}
+                      className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+                    >
+                        <option value="All">All</option>
+                        <option value="Hoops">Hoops</option>
+                        <option value="Gold plated">Gold plated</option>
+                        <option value="Simple">Simple</option>
+                        <option value="Traditional">Traditional</option>
+                        <option value="Black Metal">Black Metal</option>
+                        <option value="Rose Gold">Rose Gold</option>
+                        <option value="Cuffs">Cuffs</option>
+                        <option value="Long">Long</option>
+                    </select>
+                </div>
+              )}
+              <div className="flex items-center gap-3">
+                  <span className="text-zinc-400 text-sm font-medium tracking-wide">Sort:</span>
+                  <select 
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
                 className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
@@ -148,6 +176,7 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
               </select>
           </div>
         </div>
+      </div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-x-12 md:gap-y-16 max-w-7xl mx-auto">
           {fullyLoading ? (
