@@ -247,7 +247,7 @@ const ProductDetail = () => {
                 )}
                 {product.metalColor && (
                   <div>
-                      <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Metal Color</h3>
+                      <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Material Color</h3>
                       <p className="text-white font-medium text-base">{product.metalColor}</p>
                   </div>
                 )}
@@ -263,14 +263,6 @@ const ProductDetail = () => {
                       <p className="text-white font-medium text-base">{product.sizes}</p>
                   </div>
                 )}
-                <div>
-                    <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Authenticity</h3>
-                    <p className="text-white font-medium text-base">Guaranteed Pure</p>
-                </div>
-                <div>
-                    <h3 className="text-zinc-400 text-[9px] font-bold tracking-[0.2em] uppercase mb-1">Stock</h3>
-                    <p className="text-white font-medium text-base">{product.stock > 0 ? `${product.stock} units available` : 'Out of Stock'}</p>
-                </div>
               </div>
             </div>
 
