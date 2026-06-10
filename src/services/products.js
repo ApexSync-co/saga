@@ -48,6 +48,7 @@ const normalizeProduct = (docSnapshot) => {
     sizes: data.sizes || '',
     stock: data.stock || 0,
     metalColor: data.metalColor || '',
+    type: data.type || '',
     gemstones: data.gemstones || '',
     rating: data.rating || 5,
     reviews_count: data.reviews_count || 0,

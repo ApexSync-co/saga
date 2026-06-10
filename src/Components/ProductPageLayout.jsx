@@ -36,8 +36,18 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
 
   const filteredProducts = products.filter(product => {
       if (filterOption === 'All') return true;
-      const searchStr = `${product.name} ${product.description} ${product.metalColor || ''} ${product.material || ''}`.toLowerCase();
-      return searchStr.includes(filterOption.toLowerCase());
+      
+      // If the product has a specific type assigned from the admin panel, use it directly
+      if (product.type) {
+          return product.type.toLowerCase() === filterOption.toLowerCase();
+      }
+      
+      // Fallback for older products without a type assigned
+      const searchStr = `${product.name} ${product.description || ''} ${product.metalColor || ''} ${product.material || ''}`.toLowerCase();
+      const filterTerm = filterOption.toLowerCase();
+      const filterSingular = filterTerm.endsWith('s') ? filterTerm.slice(0, -1) : filterTerm;
+      
+      return searchStr.includes(filterTerm) || searchStr.includes(filterSingular);
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
