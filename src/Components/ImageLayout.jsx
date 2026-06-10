@@ -93,10 +93,12 @@ export default function ImageLayout(){
         
             <div className="hidden md:flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-12 px-4">
                 <h1 className="text-primary text-6xl md:text-8xl lg:text-9xl font-Great_Vibes leading-[0.8] drop-shadow-2xl">
-                    Festive Edit
+                    Chosen For You
                 </h1>
                 <p className="text-zinc-400 md:max-w-[280px] lg:max-w-xs text-sm md:text-base leading-relaxed tracking-wide font-light italic border-l border-primary/30 pl-6">
-                    pieces designed to illuminate your celebrations with elegance and grace.
+                    High taste, Low compromise.<br />
+                    Prices made to feel like Yours,<br />
+                    Instantly
                 </p>
             </div>
 
