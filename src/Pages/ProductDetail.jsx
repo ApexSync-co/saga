@@ -273,14 +273,18 @@ const ProductDetail = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button 
                   onClick={handleAddToCart}
-                  disabled={adding}
-                  className={`flex-1 group/btn relative overflow-hidden font-poppins py-6 rounded-2xl font-bold text-xl transition-all duration-700 flex items-center justify-center gap-3 shadow-2xl active:scale-95
-                    ${adding 
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-white/5 text-white border border-white/10 hover:border-primary'
-                    }`}
+                  disabled={adding || product.stock === 0}
+                  className={`flex-1 font-poppins py-6 rounded-2xl font-bold text-xl transition-all duration-700 flex items-center justify-center gap-3 shadow-2xl ${
+                    product.stock === 0 
+                      ? 'bg-zinc-900/50 text-zinc-600 border border-white/5 cursor-not-allowed'
+                      : adding 
+                        ? 'bg-green-600 text-white active:scale-95' 
+                        : 'group/btn relative overflow-hidden bg-white/5 text-white border border-white/10 hover:border-primary active:scale-95'
+                  }`}
                 >
-                  {adding ? (
+                  {product.stock === 0 ? (
+                    'OUT OF STOCK'
+                  ) : adding ? (
                     <>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-7 h-7 animate-bounce">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />

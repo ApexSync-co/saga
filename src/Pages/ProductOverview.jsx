@@ -188,17 +188,31 @@ const ProductOverview = () => {
                     <button 
                       onClick={(e) => {
                           e.stopPropagation();
+                          if (product.stock === 0) return;
                           addToCart(product);
                       }}
-                      className="w-full group/btn relative overflow-hidden bg-white/5 text-white py-4 rounded-2xl font-bold transition-all duration-500 active:scale-[0.98] border border-white/10 hover:border-primary shadow-lg"
+                      disabled={product.stock === 0}
+                      className={`w-full py-4 rounded-2xl font-bold transition-all duration-500 border shadow-lg flex items-center justify-center ${
+                        product.stock === 0 
+                          ? 'bg-zinc-900/50 text-zinc-600 border-white/5 cursor-not-allowed' 
+                          : 'group/btn relative overflow-hidden bg-white/5 text-white border-white/10 hover:border-primary active:scale-[0.98]'
+                      }`}
                     >
-                      <span className="relative z-10 flex items-center justify-center gap-2 transition-colors duration-500 group-hover/btn:text-black">
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                          </svg>
-                          Add to Bag
-                      </span>
-                      <div className="absolute inset-0 bg-primary transform translate-y-full transition-transform duration-500 group-hover/btn:translate-y-0"></div>
+                      {product.stock === 0 ? (
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          OUT OF STOCK
+                        </span>
+                      ) : (
+                        <>
+                          <span className="relative z-10 flex items-center justify-center gap-2 transition-colors duration-500 group-hover/btn:text-black">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                              </svg>
+                              Add to Bag
+                          </span>
+                          <div className="absolute inset-0 bg-primary transform translate-y-full transition-transform duration-500 group-hover/btn:translate-y-0"></div>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
