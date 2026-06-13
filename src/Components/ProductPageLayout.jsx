@@ -150,15 +150,15 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
       </div>
 
       <div className="px-4">
-        <div className="max-w-7xl mx-auto mb-10 flex justify-end">
-          <div className="flex items-center gap-6">
+        <div className="max-w-7xl mx-auto mb-6 sm:mb-10 flex justify-end">
+          <div className="flex flex-row items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full">
               {title === 'Earrings' && (
-                <div className="flex items-center gap-3">
-                    <span className="text-zinc-400 text-sm font-medium tracking-wide">Type:</span>
+                <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none">
+                    <span className="text-zinc-400 text-xs sm:text-sm font-medium tracking-wide">Type:</span>
                     <select 
                       value={filterOption}
                       onChange={(e) => setFilterOption(e.target.value)}
-                      className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+                      className="bg-[#111] border border-white/10 text-white text-xs sm:text-sm rounded-xl px-2 sm:px-4 py-2 sm:py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer w-full sm:w-auto"
                     >
                         <option value="All">All</option>
                         <option value="Hoops">Hoops</option>
@@ -172,12 +172,12 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
                     </select>
                 </div>
               )}
-              <div className="flex items-center gap-3">
-                  <span className="text-zinc-400 text-sm font-medium tracking-wide">Sort:</span>
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none">
+                  <span className="text-zinc-400 text-xs sm:text-sm font-medium tracking-wide">Sort:</span>
                   <select 
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
-                className="bg-[#111] border border-white/10 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+                className="bg-[#111] border border-white/10 text-white text-xs sm:text-sm rounded-xl px-2 sm:px-4 py-2 sm:py-2.5 focus:outline-none focus:border-primary/50 transition-colors cursor-pointer w-full sm:w-auto"
               >
                   <option value="Featured">Featured</option>
                   <option value="Price: Low to High">Price: Low to High</option>
@@ -317,6 +317,7 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (item.stock === 0) return;
                         addToCart(item);
                         const btn = e.currentTarget;
                         const originalText = btn.textContent;
@@ -327,9 +328,14 @@ const ProductPageLayout = ({ title, products, isLoading }) => {
                           btn.classList.remove('bg-primary', 'text-black', 'border-primary');
                         }, 2000);
                       }}
-                      className="w-full bg-white/5 hover:bg-white text-zinc-100 hover:text-black py-2.5 md:py-4 rounded-lg font-Poppins text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.2em] uppercase transition-all duration-500 border border-white/10 active:scale-[0.98] flex items-center justify-center"
+                      disabled={item.stock === 0}
+                      className={`w-full py-2.5 md:py-4 rounded-lg font-Poppins text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.2em] uppercase transition-all duration-500 border flex items-center justify-center ${
+                        item.stock === 0 
+                          ? 'bg-zinc-900/50 text-zinc-600 border-white/5 cursor-not-allowed' 
+                          : 'bg-white/5 hover:bg-white text-zinc-100 hover:text-black border-white/10 active:scale-[0.98]'
+                      }`}
                     >
-                      ADD TO CART
+                      {item.stock === 0 ? 'OUT OF STOCK' : 'ADD TO CART'}
                     </button>
                   </div>
                 </div>

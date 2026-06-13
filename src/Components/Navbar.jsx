@@ -48,7 +48,7 @@ function Navbar() {
          {/* Top Navigation Bar with customized deep background tone */}
          {/* <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 transition-transform duration-300 bg-[#0a0502]/80 backdrop-blur-sm shadow-lg border-b border-primary/20 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} > */}
          <nav className={`flex justify-between items-center py-4 fixed top-0 w-full z-50 transition-transform duration-300 bg-[#0a0502] shadow-lg border-b border-primary/20 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`} >
-            <ul className="flex gap-10 mx-10 max-w-fit relative z-50">
+            <ul className="flex gap-10 mx-4 md:mx-10 max-w-fit relative z-50">
                <button 
                   className="flex flex-col justify-center items-center w-8 h-8 gap-1.5 overflow-hidden hover:opacity-70 transition-opacity" 
                   onClick={() => setIsOpen(!isOpen)}
@@ -64,7 +64,7 @@ function Navbar() {
                <img src="/Logo.png" alt="Saga Home" className='md:h-16 h-12 relative z-10 group-hover:scale-105 transition-transform duration-300 filter brightness-110 contrast-125' />
             </Link>
 
-            <div className="flex text-primary gap-6 md:mx-10 mx-4">
+            <div className="flex text-primary gap-6 mx-4 md:mx-10">
                <svg onClick={() => setIsSearchOpen(true)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#FB7010" className="w-6 h-6 cursor-pointer hover:scale-110 hover:text-primary/80 transition-all">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                </svg>
@@ -84,7 +84,7 @@ function Navbar() {
          <Search isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
          {/* Drawer / Sidebar Menu updated to dark black styling while maintaining glass properties */}
-         <div className={`fixed top-0 left-0 h-screen h-[100dvh] w-[70vw] md:w-[30vw] text-gray-100 transform transition-transform duration-700 ease-in-out z-[100] flex flex-col shadow-2xl border-r border-primary/10 backdrop-blur-md ${isOpen ? "translate-x-0" : "-translate-x-full"}`} style={{ background: 'linear-gradient(135deg, rgba(10,5,2,0.75) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.95) 100%)', fontSize: 'clamp(14px, 1.6vw, 18px)' }}>
+         <div className={`fixed top-0 left-0 h-screen h-[100dvh] w-[85vw] sm:w-[70vw] md:w-[30vw] text-gray-100 transform transition-transform duration-700 ease-in-out z-[100] flex flex-col shadow-2xl border-r border-primary/10 backdrop-blur-md ${isOpen ? "translate-x-0" : "-translate-x-full"}`} style={{ background: 'linear-gradient(135deg, rgba(10,5,2,0.75) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.95) 100%)', fontSize: 'clamp(14px, 1.6vw, 18px)' }}>
             <div className="flex justify-between items-center absolute top-5 left-0 w-full px-10 z-50">
                <button 
                   className="flex flex-col justify-center items-center w-8 h-8 gap-1.5 overflow-hidden hover:opacity-70 transition-opacity" 
@@ -217,7 +217,7 @@ function Navbar() {
                </div>
             </ul>
             
-            <div className="flex flex-col gap-3 mt-8 w-full px-12 pb-8">
+            <div className="flex flex-col gap-3 mt-8 w-full px-6 md:px-12 pb-8">
                {!isAuthenticated && (
                   <>
                      <Link to="/signin" onClick={() => setIsOpen(false)} className='w-full group'>

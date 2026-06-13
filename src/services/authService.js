@@ -15,6 +15,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  confirmPasswordReset,
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
@@ -183,6 +184,30 @@ export async function resetCustomerPassword(email) {
         throw new Error('Please enter a valid email address.');
       default:
         throw new Error(error.message || 'Failed to send password reset email.');
+    }
+  }
+}
+
+/**
+ * Confirm the password reset with the code from the email
+ * @param {string} oobCode 
+ * @param {string} newPassword 
+ */
+export async function confirmCustomerPasswordReset(oobCode, newPassword) {
+  try {
+    await confirmPasswordReset(auth, oobCode, newPassword);
+    return true;
+  } catch (error) {
+    console.error("Error confirming password reset:", error);
+    switch (error.code) {
+      case 'auth/expired-action-code':
+        throw new Error('The reset link has expired. Please request a new one.');
+      case 'auth/invalid-action-code':
+        throw new Error('The reset link is invalid. It may have already been used.');
+      case 'auth/weak-password':
+        throw new Error('Password should be at least 6 characters.');
+      default:
+        throw new Error(error.message || 'Failed to reset password.');
     }
   }
 }

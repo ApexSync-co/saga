@@ -46,7 +46,7 @@ const normalizeProduct = (docSnapshot) => {
     purity: data.purity || '',
     weight: data.weight || '',
     sizes: data.sizes || '',
-    stock: data.stock || 0,
+    stock: Number(data.stock) || 0,
     metalColor: data.metalColor || '',
     type: data.type || '',
     gemstones: data.gemstones || '',

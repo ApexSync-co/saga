@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { fetchFestiveEdit } from '../services/products';
+import { useNavigate } from 'react-router-dom';
 
 const FestiveCarousel = ({ carousel }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!carousel || carousel.length === 0) return;
@@ -19,7 +21,8 @@ const FestiveCarousel = ({ carousel }) => {
             {carousel.map((item, index) => (
                 <div 
                     key={index}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                    onClick={() => navigate('/products')}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out cursor-pointer ${
                         index === currentImageIndex ? 'opacity-100' : 'opacity-0'
                     }`}
                 >
