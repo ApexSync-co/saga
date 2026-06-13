@@ -2,8 +2,79 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Check if the user is a registered Admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email != null && (
+        request.auth.token.email == 'sagakamya@gmail.com' ||
+        request.auth.token.email == 'adhinarayan206@gmail.com' ||
+        request.auth.token.email == 'savanths408@gmail.com' ||
+        request.auth.token.email == 'anushreegirish05@gmail.com'
+      );
+    }
+
+    // Public Storefront Data (Products, Categories, Reviews, Banners, StoreConfig)
+    // Anyone can read, but only Admins can create/edit/delete
+    match /products/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /categories/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /banners/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /storeConfig/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /reviews/{document=**} {
+      allow read: if true;
+      // Normal users can leave reviews if they are signed in
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // Coupons
+    // Backend checks them securely. Frontend should not read all coupons to prevent guessing.
+    match /coupons/{couponCode} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Admins can manage all orders
+      allow read, write: if isAdmin();
+      
+      // A customer can read their own order
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // A customer can cancel their own order (changing status to Cancelled)
+      allow update: if request.auth != null 
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+                    && request.resource.data.status == 'Cancelled';
+                    
+      // Order creation is blocked for everyone except backend Admin SDK
+      // (The payment_routes.py creates the orders safely)
+      allow create, delete: if false; 
+    }
+    
+    // User Profiles
+    match /users/{userId} {
+      // Admins can see/edit all users
+      allow read, write: if isAdmin();
+      
+      // Customers can only see/edit their own profile
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Global Fallback (Deny access to any collection we forgot, unless it's an Admin)
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
   }
 }

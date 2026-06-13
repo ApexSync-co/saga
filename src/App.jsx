@@ -24,6 +24,8 @@ const lazyWithRetry = (componentImport) =>
     }
   });
 
+import ProtectedRoute from './Components/ProtectedRoute'
+
 const Home = lazyWithRetry(() => import('./Pages/Home'))
 const Anklets = lazyWithRetry(() => import('./Pages/Anklets'))
 const Bracelets = lazyWithRetry(() => import('./Pages/Bracelets'))
@@ -48,6 +50,7 @@ const OrderSuccess = lazyWithRetry(() => import('./Pages/OrderSuccess'))
 const EthicalConsent = lazyWithRetry(() => import('./Pages/EthicalConsent'))
 const PrivacyPolicy = lazyWithRetry(() => import('./Pages/PrivacyPolicy'))
 const TermsOfUse = lazyWithRetry(() => import('./Pages/TermsOfUse'))
+const ResetPassword = lazyWithRetry(() => import('./Pages/ResetPassword'))
 const NotFound = lazyWithRetry(() => import('./Pages/NotFound'))
 
 // Loading component for Suspense
@@ -81,17 +84,21 @@ function App() {
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/cart" element={<Cart />} />
-      <Route path="/delivery-address" element={<DeliveryAddress />} />
-      <Route path="/payment-methods" element={<Payment />} />
-      <Route path="/accounts" element={<Accounts />} />
       <Route path="/help" element={<Help />} />
-      <Route path="/my-orders" element={<MyOrders />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/ethical-consent" element={<EthicalConsent />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-of-use" element={<TermsOfUse />} />
+      
+      {/* Protected Routes */}
+      <Route path="/delivery-address" element={<ProtectedRoute><DeliveryAddress /></ProtectedRoute>} />
+      <Route path="/payment-methods" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+      <Route path="/accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
+      <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
     </Suspense>
