@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
-// Settings — placeholder, can be implemented with Firestore later
+import { useAuth } from '../../Context/AuthContext';
+import { resetCustomerPassword } from '../../services/authService';
 
 const Settings = () => {
+    const { user } = useAuth();
     const [notifications, setNotifications] = useState({
         marketing: true,
         orderUpdates: true,
         newsletter: false
     });
+    
+    const [passwordResetStatus, setPasswordResetStatus] = useState({ loading: false, message: '', error: false });
 
-
+    const handlePasswordReset = async () => {
+        if (!user || !user.email) return;
+        
+        setPasswordResetStatus({ loading: true, message: '', error: false });
+        try {
+            await resetCustomerPassword(user.email);
+            setPasswordResetStatus({ loading: false, message: 'Password reset email sent! Check your inbox.', error: false });
+        } catch (error) {
+            setPasswordResetStatus({ loading: false, message: error.message || 'Failed to send reset email.', error: true });
+        }
+    };
 
     return (
         <div className="pt-24 min-h-screen text-white container mx-auto px-4 md:px-10 mb-10">
@@ -71,12 +85,21 @@ const Settings = () => {
                     </h2>
                      <div className="space-y-4">
                         <div className="flex items-center justify-between border-b border-white/10 pb-4 last:border-0 last:pb-0">
-                            <p className="font-medium text-white/80">Change Password</p>
-                            <button className="text-primary font-semibold hover:text-white transition-colors border border-primary px-4 py-1 rounded text-sm hover:bg-primary">Update</button>
-                        </div>
-                         <div className="flex items-center justify-between border-b border-white/10 pb-4 last:border-0 last:pb-0">
-                            <p className="font-medium text-white/80">Two-Factor Authentication</p>
-                            <button className="text-primary font-semibold hover:text-white transition-colors border border-primary px-4 py-1 rounded text-sm hover:bg-primary">Enable</button>
+                            <div>
+                                <p className="font-medium text-white/80">Change Password</p>
+                                {passwordResetStatus.message && (
+                                    <p className={`text-xs mt-1 ${passwordResetStatus.error ? 'text-red-500' : 'text-green-500'}`}>
+                                        {passwordResetStatus.message}
+                                    </p>
+                                )}
+                            </div>
+                            <button 
+                                onClick={handlePasswordReset}
+                                disabled={passwordResetStatus.loading}
+                                className="text-primary font-semibold hover:text-white transition-colors border border-primary px-4 py-1 rounded text-sm hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {passwordResetStatus.loading ? 'Sending...' : 'Update'}
+                            </button>
                         </div>
                      </div>
                  </div>
